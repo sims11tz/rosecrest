@@ -1,0 +1,75 @@
+{
+	"name": "client",
+	"license": "tokill",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@babel/preset-typescript": "^7.24.1",
+		"@dnd-kit/core": "^6.1.0",
+		"@dnd-kit/modifiers": "^7.0.0",
+		"@emotion/react": "^11.11.4",
+		"@emotion/styled": "^11.11.5",
+		"@fontsource/roboto": "^5.0.12",
+		"@mui/icons-material": "^5.15.15",
+		"@mui/material": "^5.15.15",
+		"ag-charts-enterprise": "^9.3.1",
+		"ag-charts-react": "^9.3.1",
+		"ag-grid-community": "^31.2.0",
+		"ag-grid-react": "^31.2.0",
+		"axios": "^1.6.8",
+		"customize-cra": "^1.0.0",
+		"nodemon": "^3.1.0",
+		"npm-watch": "^0.11.0",
+		"parcel": "^1.12.4",
+		"parcel-bundler": "^1.12.5",
+		"react": "^18.2.0",
+		"react-app-rewired": "^2.2.1",
+		"react-dnd": "^16.0.1",
+		"react-dnd-accessible-backend": "^2.1.0",
+		"react-dnd-html5-backend": "^16.0.1",
+		"react-dnd-multi-backend": "^8.0.3",
+		"react-dom": "^18.2.0",
+		"react-refresh-webpack-plugin": "^0.1.0",
+		"react-router-dom": "^6.22.3",
+		"react-scripts": "^5.0.1",
+		"ts-loader": "^9.5.1",
+		"tsconfig-paths": "^4.2.0",
+		"tsconfig-paths-webpack-plugin": "^4.1.0",
+		"typescript": "4.9",
+		"webpack": "^5.91.0",
+		"yarn": "^1.22.22"
+	},
+	"scripts": {
+		"start": "nodemon -L --exec 'PORT=3000 react-app-rewired start' --openssl-legacy-provider --ignore 'public/' -e ts,tsx,js,jsx,mjs,cjs,json,css",
+		"startWindows": "nodemon -L --exec \"cross-env BROWSER=none PORT=3001 react-app-rewired start\" --openssl-legacy-provider --ignore public/ -e ts,tsx,js,jsx,mjs,cjs,json,css",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
+	},
+	"eslintConfig": {
+		"extends": "react-app"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"@babel/plugin-proposal-private-property-in-object": "^7.x.x",
+		"@types/node": "^20.11.30",
+		"@types/react": "^18.2.73",
+		"@types/react-dom": "^18.2.22",
+		"fork-ts-checker-webpack-plugin": "^9.0.2"
+	},
+	"keywords": [
+		"react",
+		"ag-grid"
+	]
+}

@@ -1,0 +1,19 @@
+.menuItemButton
+{
+	cursor: pointer;
+	user-select: none;
+
+	display:flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.menuItemIcon
+{
+	margin-right: 8px;
+}
+
+.menuItemText
+{
+	margin-left: 5px;
+}

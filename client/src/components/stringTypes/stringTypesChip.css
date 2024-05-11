@@ -1,0 +1,52 @@
+.chipContainer
+{
+	margin-left: 2px;
+	margin-right: 2px;
+
+	color: darkblue;
+
+	border: 1px;
+	border-color: #000000;
+	
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.chipContainer.groups
+{
+	border-radius: 50%;
+}
+
+.chipContainer.tags
+{
+	border-radius: 25%;
+}
+
+.chipContainer.large
+{
+	height: 50px;
+	width: 50px;
+}
+
+.chipContainer.medium
+{
+	height: 25px;
+	width: 25px;
+	padding: 8px;
+	font-size: 16px;
+}
+
+.chipContainer.small
+{
+	height: 14px;
+	width: 14x;
+	padding: 4px;
+	font-size: 10px;
+}
+
+.chipText
+{
+	text-align: center;
+}

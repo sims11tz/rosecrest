@@ -1,0 +1,32 @@
+
+.ag-theme-quartz {
+	--ag-row-hover-color: #aacced;
+	--ag-selected-row-background-color:rgb(0, 255, 0, 0.3);
+}
+
+.ag-root-wrapper-body.ag-layout-normal.ag-focus-managed {
+	/*height: 100%;*/
+}
+
+.ag-grid-container-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.ag-grid-container {
+	flex: 1;
+	flex-grow: 1;
+	flex-shrink: 0;
+	flex-basis: 0;
+}
+
+.aggrid_container {
+	flex: 1;
+	height: 100%;
+	width: 100%;
+	
+}
+
+.ag-bl-full-height,
+.ag-bl-full-height-center { height: 100%; }

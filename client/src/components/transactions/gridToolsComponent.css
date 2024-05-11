@@ -1,0 +1,11 @@
+.toolsContainer
+{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.toolsTool
+{
+    width: 50%;
+}

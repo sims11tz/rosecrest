@@ -1,0 +1,190 @@
+version: '3.8'
+
+x-common-variables: &common-variables
+  REACT_APP_SERVER_PORT: 7000
+  SERVICE_LIST: "server_geurts_home,server_aws_california,server_aws_ohio,server_aws_brazil,server_aws_dublin,server_aws_tokyo,server_aws_paris"
+  server_geurts_home_ip: 172.32.0.3
+  server_geurts_home_port: 7003
+  server_aws_california: 172.32.0.4
+  server_aws_california_port: 7004
+  server_aws_ohio: 172.32.0.5
+  server_aws_ohio_port: 7005
+  server_aws_brazil: 172.32.0.6
+  server_aws_brazil_port: 7006
+  server_aws_dublin: 172.32.0.7
+  server_aws_dublin_port: 7007
+  server_aws_tokyo: 172.32.0.8
+  server_aws_tokyo_port: 7008
+  server_aws_paris: 172.32.0.9
+  server_aws_paris_port: 7009
+
+networks:
+  my-network:
+    ipam:
+      config:
+        - subnet: 172.32.0.0/16
+
+volumes:
+  misc-data:
+    driver: local
+
+services:
+
+  client:
+    build: 
+      context: .
+      dockerfile: ./client/Dockerfile
+    container_name: client_container
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.1
+    environment:
+      <<: *common-variables
+    ports:
+      - 7001:7001
+    volumes:
+      - ./client/src:/app/client/src
+      - ./client/public:/app/client/public
+      - ./shared:/app/shared
+    command: yarn start
+    stdin_open: true
+
+  server1:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server_geurts_home
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.3
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared:/app/shared
+    environment:
+      <<: *common-variables
+      LOCATION: Geurts_House
+      LATENCY: 5
+    ports:
+      - 7003:7002
+    command: npm start
+    stdin_open: true
+
+  server2:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server_aws_california
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.4
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared:/app/shared
+    environment:
+      <<: *common-variables
+      LOCATION: USA_California
+      LATENCY: 15
+    ports:
+      - 7004:7002
+    command: npm start
+    stdin_open: true
+
+  server3:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server_aws_ohio
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.5
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared:/app/shared
+    environment:
+      <<: *common-variables
+      LOCATION: USA_Ohio
+      LATENCY: 10
+    ports:
+      - 7005:7002
+    command: npm start
+    stdin_open: true
+
+  server4:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server_aws_paris
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.6
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared:/app/shared
+    environment:
+      <<: *common-variables
+      LOCATION: Europe_France_Paris
+      LATENCY: 45
+    ports:
+      - 7006:7002
+    command: npm start
+    stdin_open: true
+
+  server5:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server_aws_tokyo
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.7
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared:/app/shared
+    environment:
+      <<: *common-variables
+      LOCATION: Asia_Japan_Tokyo
+      LATENCY: 30
+    ports:
+      - 7007:7002
+    command: npm start
+    stdin_open: true
+
+  server6:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server_aws_dublin
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.8
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared:/app/shared
+    environment:
+      <<: *common-variables
+      LOCATION: Europe_Ireland_Dublin
+      LATENCY: 200
+    ports:
+      - 7008:7002
+    command: npm start
+    stdin_open: true
+
+  server7:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server_aws_brazil
+    networks:
+      my-network:
+        ipv4_address: 172.32.0.9
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared:/app/shared
+    environment:
+      <<: *common-variables
+      LOCATION: SouthAmerica_Brazil_SaoPaulo
+      LATENCY: 100
+    ports:
+      - 7009:7002
+    command: npm start
+    stdin_open: true

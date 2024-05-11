@@ -1,0 +1,38 @@
+.headerContainer
+{
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+}
+
+.headerLogo
+{
+	background-image: url('/public/images/logo.png');
+	width: 145px;
+	height: 36px;
+}
+
+.headerButton
+{
+	font-size: 26px;
+	/* font-weight: bold; */
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+.headerButtonContent
+{
+	width: 100%;
+	height: 100%;
+}
+
+.headerButtonContent:hover
+{
+	background-color: aqua;
+}
+
+.headerSpacer
+{
+	margin-left: 25px;
+	margin-right: 25px;
+}

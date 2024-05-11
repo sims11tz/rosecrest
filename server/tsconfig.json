@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "outDir": "./dist/",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+	"baseUrl": ".",
+	"paths": {
+		"@shared/*": ["../shared/*"]
+	}
+  },
+  "include": ["src/**/*","db/scripts/**/*","../shared/**/*","./../shared/**/*","shared/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
