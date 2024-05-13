@@ -74,9 +74,61 @@ wss.on('connection', (ws) => {
 				Log.info('SERVER_CALL_TYPE.SEND_PACKET');
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Packet sent"} as ServerResponseMessageObj;
 
-				let wsResponse:ServerResponseMessageObj = await SocketClient.get().Call(serverCallObj);
-				Log.info('wsResponse : ',wsResponse);
-				responseObj.data = wsResponse;
+				//PREP
+					// Tell my clients to go into ready mode
+					// Tell the target to go into waiting mode
+					// Do a countdown and have my clients show the countdown
+					// SHOW SENDING
+					// SHOW target when it gets stuff.... just add prop to ping
+
+				Log.info('');
+				Log.info('');
+				Log.info('');
+				Log.info('___________________________________________ SEND TO CLIENTS ______________');
+
+				let startMessage:ServerResponseMessageObj = {
+					callId: -1,
+					callTime: 0,
+					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
+					message: "Starting packet send operation"
+				};
+
+				let idx:number = 0;
+				wss.clients.forEach(client => {
+					idx++;
+					Log.info('client <'+server_alias+'>  <'+idx+'>__________________________ ');
+					if (client.readyState === WebSocket.OPEN) {
+						Log.info('sending start message to client '+client.url);
+
+						client.send(JSON.stringify(startMessage));
+					}
+					else
+					{
+						Log.info('CANT SEND MESSAGE');
+					}
+				});
+
+
+				Log.info('____________________ DONE <'+idx+'>___________________');
+				Log.info('');
+				Log.info('');
+
+				let wsResponses:ServerResponseMessageObj[] = await SocketClient.get().Call(serverCallObj);
+
+				
+				Log.info('wsResponses['+wsResponses.length+'] : ',wsResponses);
+
+				let totalTime:number = 0;
+				let totalCalls:number =0;
+				wsResponses.forEach((wsResponse:ServerResponseMessageObj) => {
+					totalCalls++;
+					totalTime += wsResponse.callTime;
+				});
+
+				responseObj.data = {totalCalls:totalCalls,totalTime:totalTime};
+				responseObj.message = "pinged : "+totalCalls+"   took : "+totalTime+" ms";
+
+				//Tell my clients to show the results
 
 			break;
 

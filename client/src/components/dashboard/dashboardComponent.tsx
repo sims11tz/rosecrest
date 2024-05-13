@@ -13,7 +13,7 @@ function DashboardComponent() {
 
 	useEffect(() => { 
 
-		console.log(' SUP BITCH dashbaord init() ---- ');
+		
 
 	
 	}, []);

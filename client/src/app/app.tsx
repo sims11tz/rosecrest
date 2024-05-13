@@ -6,6 +6,8 @@ import DashboardComponent from 'components/dashboard/dashboardComponent';
 
 import './app.css';
 import ClientComponent from 'components/client/clientComponent';
+import RosecrestComponent from 'components/rosecrest/rosecrest';
+import ClientSelectorComponent from 'components/client/clientSelectorComponent';
 
 function App()
 {
@@ -34,7 +36,9 @@ const AppContent = React.memo(() => {
 			) : (
 				<div id="routesContainer">
 					<Routes>
-						<Route path="/" element={<ClientComponent />} />
+						<Route path="/" element={<RosecrestComponent />} />
+						<Route path="/client" element={<ClientSelectorComponent />} />
+						<Route path="/client/:clientId" element={<ClientComponent />} />
 						<Route path="/dashboard" element={<DashboardComponent />} />
 					</Routes>
 				</div>

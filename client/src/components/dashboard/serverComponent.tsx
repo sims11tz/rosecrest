@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState, type FC } from 'react'
-import { SendPacketObj, SERVER_CALL_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from '@shared/DataTypes';
+import { SendPacketObj, SERVER_CALL_TYPE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from '@shared/DataTypes';
 import Button from '@mui/material/Button';
 import SocketController from 'controllers/SocketController';
 import { CUSTOM_EVENTS, SERVER_NODE_STATE } from 'dataTypes/ClientDataTypes';
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import AppController from 'controllers/AppController';
 
 import './serverComponent.css';
-import AppController from 'controllers/AppController';
 
 interface ServerComponentProps {
 	serverObj: ServerObj;
@@ -17,16 +17,20 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 	const onDoubleClick = (e:React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 
 		e.preventDefault();
-		console.log(' double click bruh');
+		console.log(' double click br uh');
 		
 	};
 
+	const [allString, setAllString] = useState<string>('');
+
 	useEffect(() => { 
 
-		// console.log(' node init() ---- ',serverObj.alias);
-		window.addEventListener(CUSTOM_EVENTS.SOCKER_SERVER_OPEN, onServerOpen);
-		window.addEventListener(CUSTOM_EVENTS.SOCKER_SERVER_CLOSED, onServerClosed);
-		window.addEventListener(CUSTOM_EVENTS.SOCKER_SERVER_ERROR, onServerError);
+		
+		setAllString(AppController.get().Servers.map(serverObj => serverObj.alias).join(','));
+
+		window.addEventListener(CUSTOM_EVENTS.SOCKET_SERVER_OPEN, onServerOpen);
+		window.addEventListener(CUSTOM_EVENTS.SOCKET_SERVER_CLOSED, onServerClosed);
+		window.addEventListener(CUSTOM_EVENTS.SOCKET_SERVER_ERROR, onServerError);
 
 		window.addEventListener(CUSTOM_EVENTS.ALL_CONNECT, onAllConnect);
 		window.addEventListener(CUSTOM_EVENTS.ALL_DISCONNECT, onAllDisconnect);
@@ -34,9 +38,9 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 		
 	
 		return () => {
-			window.removeEventListener(CUSTOM_EVENTS.SOCKER_SERVER_OPEN, onServerOpen);
-			window.removeEventListener(CUSTOM_EVENTS.SOCKER_SERVER_CLOSED, onServerClosed);
-			window.removeEventListener(CUSTOM_EVENTS.SOCKER_SERVER_ERROR, onServerError);
+			window.removeEventListener(CUSTOM_EVENTS.SOCKET_SERVER_OPEN, onServerOpen);
+			window.removeEventListener(CUSTOM_EVENTS.SOCKET_SERVER_CLOSED, onServerClosed);
+			window.removeEventListener(CUSTOM_EVENTS.SOCKET_SERVER_ERROR, onServerError);
 
 			window.removeEventListener(CUSTOM_EVENTS.ALL_CONNECT, onAllConnect);
 			window.removeEventListener(CUSTOM_EVENTS.ALL_DISCONNECT, onAllDisconnect);
@@ -51,7 +55,6 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 		setClickCount(clickCount+1);
 
 		let callObj:ServerCallMessageObj = {callId:SocketController.get().callId, callType: callType};
-
 		if(callType === SERVER_CALL_TYPE.CONNECT || callType === SERVER_CALL_TYPE.DISCONNECT)
 		{
 			setServerActionsSent("");
@@ -59,19 +62,28 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 		}
 		else if(callType === SERVER_CALL_TYPE.SEND_PACKET || callType === SERVER_CALL_TYPE.START_PACKET_STREAM || callType === SERVER_CALL_TYPE.END_PACKET_STREAM)
 		{
+			if(selectedTarget === '') 
+			{
+				setServerActionsSent(" You must select a target server first.");
+				return;
+			}
+
 			callObj.data = {target:selectedTarget} as SendPacketObj;
 
 			setServerActionsSent("sent <"+callObj.callId+"> : "+callType+"  ");
 			setServerActionsReceived("WAITING....");
 		}
 
-		SocketController.get().sendMessage(serverObj, callObj, (response:ServerResponseMessageObj) => {
-
-			console.log('...... RECEIVED ---- ('+serverObj.alias+')<'+callType+'> response : ',response);
-			setServerActionsReceived("received <"+response.callId+"> : "+response.responseType+" -- "+response.message+" ");
-
-		});
+		SocketController.get().sendMessage(serverObj, callObj, receiveMessage);
 	};
+
+	const receiveMessage = (response:ServerResponseMessageObj) => {
+		
+		if(response.responseType === SERVER_RESPONSE_TYPE.MESSAGE)
+		{
+			setServerActionsReceived("received <"+response.callId+"> : "+response.responseType+" -- "+response.message+" ");
+		}
+	}
 
 	const onAllConnect = (event:Event) => {
 		onClickButton(SERVER_CALL_TYPE.CONNECT);
@@ -144,11 +156,9 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 										value={selectedTarget}
 										onChange={handleTargetChange}
 									>
+									<MenuItem key="all_servers" value={allString}>All Servers</MenuItem>
 									{AppController.get().Servers.map((serverObjIn: ServerObj) => {
-										if (serverObjIn.alias == serverObj!.alias) {
-											return null;
-										}
-										
+										if (serverObjIn.alias === serverObj!.alias){ return null; }
 										return (
 											<MenuItem key={serverObjIn.alias} value={serverObjIn.alias}>
 												{`${serverObjIn.alias} ${serverObjIn.ip}:${serverObjIn.port_external}`}

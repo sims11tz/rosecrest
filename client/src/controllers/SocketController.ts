@@ -1,4 +1,4 @@
-import { SERVER_CALL_TYPE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from "@shared/DataTypes";
+import { MessageDictObj, MessagesDictionary, SERVER_CALL_TYPE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from "@shared/DataTypes";
 import { CUSTOM_EVENTS } from "dataTypes/ClientDataTypes";
 import { ServerResponse } from "http";
 
@@ -11,6 +11,7 @@ export default class SocketController {
 
 
 	private _sockets: Map<string, WebSocket> = new Map<string, WebSocket>();
+	private _messages:MessagesDictionary = new MessagesDictionary();
 
 	public connect(serverObj: ServerObj): WebSocket {
 
@@ -24,16 +25,37 @@ export default class SocketController {
 
 			socket = new WebSocket(`ws://${serverObj.ip}:${serverObj.port_external}`);
 			socket.onopen = () => {
-				window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKER_SERVER_OPEN,{detail:serverObj}));
+				window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKET_SERVER_OPEN,{detail:serverObj}));
 			};
 
 			socket.onerror = (error) => {
-				window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKER_SERVER_ERROR,{detail:serverObj}));
+				window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKET_SERVER_ERROR,{detail:serverObj}));
 			}
 
 			socket.onclose = () => {
-				window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKER_SERVER_CLOSED,{detail:serverObj}));
-			} 
+				window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKET_SERVER_CLOSED,{detail:serverObj}));
+			}
+
+			socket.onmessage = (event:MessageEvent) => {
+				// console.log('');
+				// console.log('____________________________________');
+				// console.log('onMessage < OMG OMG OMG OMG OMG > : ',event);
+				
+				let responseObj:ServerResponseMessageObj = JSON.parse(event.data);
+				if(responseObj.responseType === SERVER_RESPONSE_TYPE.WELCOME)
+				{
+					window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKET_SERVER_OPEN,{detail:serverObj}));
+				}
+				else if(responseObj.responseType === SERVER_RESPONSE_TYPE.MESSAGE)
+				{
+					let messageDictObj:MessageDictObj = this._messages.dict[responseObj.callId];
+					messageDictObj.callBack(responseObj);
+				}
+				else if(responseObj.responseType === SERVER_RESPONSE_TYPE.CLIENT_MESSAGE)
+				{
+					window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKET_CLIENT_MESSAGE,{detail:responseObj}));
+				}
+			}
 
 			this._sockets.set(serverObj.alias, socket);
 		}
@@ -51,33 +73,17 @@ export default class SocketController {
 		const socket = this.connect(serverObj);
 		if (socket.readyState === WebSocket.OPEN)
 		{
+			this._messages.dict[serverCallObj.callId] = {callId:serverCallObj.callId, callBack:callback};
 			socket.send(JSON.stringify(serverCallObj));
 
-			socket.onmessage = (event) => {
-				this.onMessage(event, serverObj, callback);
-			};
 		} else {
 			socket.onopen = () => {
 
+
+				this._messages.dict[serverCallObj.callId] = {callId:serverCallObj.callId, callBack:callback};
 				socket.send(JSON.stringify(serverCallObj));
 
-				socket.onmessage = (event) => {
-					this.onMessage(event, serverObj, callback);
-				};
 			};
-		}
-	}
-
-	private onMessage(event: MessageEvent, serverObj: ServerObj, callback:(data:any) => void) {
-
-		let responseObj:ServerResponseMessageObj = JSON.parse(event.data);
-		if(responseObj.responseType === SERVER_RESPONSE_TYPE.WELCOME)
-		{
-			window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKER_SERVER_OPEN,{detail:serverObj}));
-		}
-		else if(responseObj.responseType === SERVER_RESPONSE_TYPE.MESSAGE)
-		{
-			callback(responseObj);
 		}
 	}
 }
