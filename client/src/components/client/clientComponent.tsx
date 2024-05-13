@@ -127,16 +127,6 @@ function ClientComponent() {
 		}
 	},[clientStatus,heartBeatIdx2]);
 
-
-	// export enum CLIENT_NODE_ACTION_STATE {
-	// 	NONE = 'NONE',
-	// 	COUNTDOWN = 'COUNTDOWN',
-	// 	LISTENING = 'LISTENING',
-	// 	SENDING = 'SENDING',
-	// 	RECEIVED = 'RECEIVED',
-	// 	RESULTS = 'RESULTS',
-	// }
-
 	const onClientMessage = (event:Event) => {
 		let ce:CustomEvent = event as CustomEvent;
 
@@ -155,27 +145,56 @@ function ClientComponent() {
 		switch(ce.detail.clientState)
 		{
 			case CLIENT_NODE_ACTION_STATE.LISTENING:
+				console.log('CLIENT_NODE_ACTION_STATE.LISTENING : ',ce.detail);
 				setClientStatusContent(
 				<div>
 					<h1>Listening.....</h1>
+					{ce.detail.data.deltaCallType === SERVER_CALL_TYPE.SEND_PACKET ? (
+						<div>For one 1 packet from {ce.detail.delta}</div>
+					)
+					:
+					(
+						<div>For packet stream from {ce.detail.delta}</div>
+					)}
 				</div>);
 			break;
 
 			case CLIENT_NODE_ACTION_STATE.COUNTDOWN:
 				setClientStatusContent(
 					<div>
-						<h1>COUNT DOWN</h1>
+						<h1>COUNT-DOWN</h1>
 						<div className="countDownNumber">{ce.detail.clientData.countdown}</div>
 					</div>);
 			break;
 
 			case CLIENT_NODE_ACTION_STATE.RECEIVED:
 
-
+				console.log('CLIENT_NODE_ACTION_STATE.RECEIVED : ',ce.detail);
 				setClientStatusContent(
 					<div>
 						<h1>RECEIVED PING</h1>
 						<div>{ce.detail.message}</div>
+						<div>&nbsp;</div>
+						{ce.detail.data.deltaCallType === SERVER_CALL_TYPE.SEND_PACKET ? (
+							<div></div>
+						)
+						:
+						(
+							<div>
+								<div>
+									<div>{ce.detail.data.streamResponses.length} out of {ce.detail.data.numPackets}</div>
+								</div>
+								<div>
+									<div>
+										{ce.detail.data.streamResponses.map((obj:ServerResponseMessageObj, index:number) => (
+											<div key={"streamResults_"+index}>
+												<div>Received packet from {ce.detail.data.delta}</div>
+											</div>
+										))}
+									</div>
+								</div>
+							</div>
+						)}
 					</div>);
 			break;
 

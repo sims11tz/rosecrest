@@ -1,12 +1,19 @@
-import { SendPacketObj, SERVER_CALL_TYPE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerResponseMessageObj } from "@shared/DataTypes";
+import { CLIENT_NODE_ACTION_STATE, SendPacketObj, SERVER_CALL_TYPE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerResponseMessageObj } from "@shared/DataTypes";
 import WebSocket, { WebSocketServer } from 'ws';
 import Log from "../utils/Log";
+import MiscUtils from "@shared/MiscUtils";
 
 export class SocketClient {
 	private static instance: SocketClient;
 	public static get(): SocketClient { if (!SocketClient.instance) { SocketClient.instance = new SocketClient(); } return SocketClient.instance; }
 	constructor() {};
 	
+	private _wss!:WebSocketServer;
+	public setWss(wss:WebSocketServer)
+	{
+		this._wss = wss;
+	}
+
 	public CallAnotherServer(serverCallObj: ServerCallMessageObj): Promise<ServerResponseMessageObj[]>
 	{
 		return new Promise(async (resolve, reject) => {
@@ -37,21 +44,8 @@ export class SocketClient {
 
 			wsc.on('open', () => {
 				try {
-					// let packetObj: ServerCallMessageObj = {
-					// 	callId: 1,
-					// 	callType: serverCallObj.callType,
-					// 	data: {}
-					// };
 					startTime = Date.now();
-					
-					// Log.info("_________"+process.env.SERVER_ALIAS+"__________________");
-					// Log.info("___________________________");
-					// Log.info("___________________________");
-					// Log.info("___________________________ target = ",target);
-					// Log.info("_________"+process.env.SERVER_ALIAS+"__________________send serverCallObj:",serverCallObj);
-
 					wsc.send(JSON.stringify(serverCallObj));
-
 				} catch (error) {
 					console.error('Error opening WebSocket:', error);
 					wsc.close();
@@ -61,23 +55,14 @@ export class SocketClient {
 
 			wsc.on('message', (message: string) => {
 				try {
-
-					// Log.info("___________"+process.env.SERVER_ALIAS+"________________onMessage() "+message);
-
 					const serverResponseMessageObj: ServerResponseMessageObj = JSON.parse(message);
 					serverResponseMessageObj.target = target;
 					if ([SERVER_RESPONSE_TYPE.MESSAGE,SERVER_RESPONSE_TYPE.CLIENT_MESSAGE].includes(serverResponseMessageObj.responseType)) {
-
-						// Log.info("_________"+process.env.SERVER_ALIAS+"__________________onMessage() IN ");
 
 						serverResponseMessageObj.callTime = Date.now() - startTime;
 
 						resolve(serverResponseMessageObj);
 						wsc.close();
-					}
-					else
-					{
-						// Log.info("__________"+process.env.SERVER_ALIAS+"_________________onMessage() OUT ");
 					}
 				} catch (error) {
 					console.error('Error handling message:', error);
@@ -98,15 +83,12 @@ export class SocketClient {
 		});
 	}
 
-	public async SendToAllClients(wss:WebSocketServer, clientMessage: ServerResponseMessageObj)
+	public async SendToAllClients(clientMessage: ServerResponseMessageObj)
 	{
-		// Log.info('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SendToAllClients %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-
 		return new Promise((resolve, reject) => {
 
-			// Log.info(' SendToAllClients.Promise()');
 			let idx:number = 0;
-			wss.clients.forEach(client => {
+			this._wss.clients.forEach(client => {
 				idx++;
 				if (client.readyState === WebSocket.OPEN)
 				{
@@ -114,8 +96,70 @@ export class SocketClient {
 				}
 			});
 
-			// Log.info(' RESOLVE.............'+idx);
 			resolve({message:'sent to '+idx+' clients'});
 		});
 	}
+
+	public async AllTargetClientsListenMode(serverCallObj:ServerCallMessageObj)
+	{
+		Log.info('_______________________');
+		Log.info('_______________________');
+		Log.info('_______________________');
+		Log.info('_______________________');
+		Log.info('AllTargetClientsListenMode : ',serverCallObj);
+
+		//Tell targets clients to go into listen mode
+		let serverCallObjListening:ServerCallMessageObj = {
+			...serverCallObj,
+			callType:SERVER_CALL_TYPE.RELAY_TO_ALL_CLIENTS,
+			data: {
+				...serverCallObj.data,
+				deltaCallType:serverCallObj.callType,
+				clientState:CLIENT_NODE_ACTION_STATE.LISTENING,
+				message:"listen mode please",
+				delta:process.env.SERVER_ALIAS
+			}
+		};
+		console.log('serverCallObjListening:',serverCallObjListening);
+		Log.info('_______________________');
+		Log.info('_______________________');
+		Log.info('_______________________');
+		
+		await this.CallAnotherServer(serverCallObjListening);
+	}
+	
+	public async AllMyClientsShowCountDown(countfrom:number=5)
+	{
+		//Show CountDown on my clients
+		let clientMessage:ServerResponseMessageObj = {
+			callId: -1,
+			callTime: 0,
+			responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
+			clientState: CLIENT_NODE_ACTION_STATE.COUNTDOWN,
+			clientData: {countdown:5},
+			message: "preparing packet send operation"
+		};
+
+		for(let x:number=countfrom; x>=0; x--)
+		{
+			await MiscUtils.GhettoWait(1000);
+			clientMessage.clientData = {countdown:x};
+			await this.SendToAllClients(clientMessage);
+		}
+	}
+
+	public async AllMyClientsShowResults(wsResponses:ServerResponseMessageObj[])
+	{
+		//Tell my clients to show the results
+		let clientResultsMessage:ServerResponseMessageObj = {
+			callId: -1,
+			callTime: 0,
+			responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
+			clientState: CLIENT_NODE_ACTION_STATE.RESULTS,
+			clientData: {countdownResults:wsResponses},
+			message: "preparing packet send operation"
+		};
+		await this.SendToAllClients(clientResultsMessage);
+	}
+
 }

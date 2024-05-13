@@ -73,8 +73,10 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 				setServerActionsSent(" You must select a target server first.");
 				return;
 			}
-
-			callObj.data = {target:selectedTarget} as SendPacketObj;
+			callObj.data = {
+				target:selectedTarget,
+				numPackets: (callType === SERVER_CALL_TYPE.START_PACKET_STREAM)?10:1
+			} as SendPacketObj;
 
 			setServerActionsSent("sent <"+callObj.callId+"> : "+callType+"  ");
 			setServerActionsReceived("WAITING....");

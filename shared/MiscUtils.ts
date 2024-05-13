@@ -72,4 +72,8 @@ export default class MiscUtils {
 		const milliseconds = ms % 1000;
 		return `${seconds}s ${milliseconds}ms`;
 	}
+
+	public static GhettoWait(ms:number) { 
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
 }

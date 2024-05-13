@@ -73,6 +73,7 @@ export interface ServerCallMessageObj {
 
 export interface SendPacketObj {
 	target: string;
+	numPackets: number;
 }
 
 export interface SendPacketResponseObj {

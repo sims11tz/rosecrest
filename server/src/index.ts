@@ -39,12 +39,12 @@ Log.info("<"+server_alias+"> latency : "+latency);
 // Create a single HttpServer from the express app
 const httpServer = createServer(app);
 
-function ghettoWait(ms:number) { 
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
+
 
 // Initialize the WebSocket on the HttpServer
 const wss = new WebSocketServer({ server: httpServer });
+SocketClient.get().setWss(wss);
+
 wss.on('connection', (ws) => {
 	ws.on('message', async (message) => {
 		// Log.info(`${server_alias} Received: ${message}`);
@@ -80,41 +80,21 @@ wss.on('connection', (ws) => {
 					clientState: CLIENT_NODE_ACTION_STATE.RESET,
 					message: "reset your state please..."
 				};
-				await SocketClient.get().SendToAllClients(wss,clientResetMessage);
+				await SocketClient.get().SendToAllClients(clientResetMessage);
 			break;
 
 			case SERVER_CALL_TYPE.SEND_PACKET:
+				Log.info('SERVER_CALL_TYPE.SEND_PACKET');
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Packet sent"} as ServerResponseMessageObj;
 
-			//Tell targets clients to go into listen mode
-				let serverCallObjListening:ServerCallMessageObj = {
-					...serverCallObj,
-					callType:SERVER_CALL_TYPE.RELAY_TO_ALL_CLIENTS,
-					data: {
-						...serverCallObj.data,
-						clientState:CLIENT_NODE_ACTION_STATE.LISTENING,
-						message:"listen mode please"
-					}
-				};
-				await SocketClient.get().CallAnotherServer(serverCallObjListening);
+				//Tell targets clients to go into listen mode
+				await SocketClient.get().AllTargetClientsListenMode(serverCallObj);
 				
-			//Show CountDown on my clients
-				let clientMessage:ServerResponseMessageObj = {
-					callId: -1,
-					callTime: 0,
-					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
-					clientState: CLIENT_NODE_ACTION_STATE.COUNTDOWN,
-					clientData: {countdown:5},
-					message: "preparing packet send operation"
-				};
-				for(let x:number=2; x>=0; x--)
-				{
-					await ghettoWait(1000);
-					clientMessage.clientData = {countdown:x};
-					await SocketClient.get().SendToAllClients(wss,clientMessage);
-				}
+				//Show CountDown on my clients
+				await SocketClient.get().AllMyClientsShowCountDown(3);
 
-			//Tell targets to send the packet
+				//Tell targets to send the packet
+				serverCallObj.data.deltaCallType = serverCallObj.callType;
 				serverCallObj.callType = SERVER_CALL_TYPE.PING;
 				let wsResponses:ServerResponseMessageObj[] = await SocketClient.get().CallAnotherServer(serverCallObj);
 				let totalTime:number = 0;
@@ -126,43 +106,82 @@ wss.on('connection', (ws) => {
 				responseObj.data = {totalCalls:totalCalls,totalTime:totalTime};
 				responseObj.message = "pinged : "+totalCalls+"   took : "+totalTime+" ms";
 
-			//Tell targets that they received a packet
+				//Tell targets that they received a packet
 				let serverCallObjReceived:ServerCallMessageObj = {
 					...serverCallObj,
 					callType:SERVER_CALL_TYPE.RELAY_TO_ALL_CLIENTS,
 					data: {
 						...serverCallObj.data,
 						clientState:CLIENT_NODE_ACTION_STATE.RECEIVED,
-						message:"I received a ping from"+server_alias,
+						message:"I received a ping from "+server_alias,
 						delta:server_alias
 					}
 				};
 				await SocketClient.get().CallAnotherServer(serverCallObjReceived);
 
-			//Tell my clients to show the results
-				let clientResultsMessage:ServerResponseMessageObj = {
-					callId: -1,
-					callTime: 0,
-					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
-					clientState: CLIENT_NODE_ACTION_STATE.RESULTS,
-					clientData: {countdownResults:wsResponses},
-					message: "preparing packet send operation"
-				};
-				await SocketClient.get().SendToAllClients(wss,clientResultsMessage);
+				//Tell my clients to show the results
+				await SocketClient.get().AllMyClientsShowResults(wsResponses);
 
 			break;
 
 			case SERVER_CALL_TYPE.START_PACKET_STREAM:
-				Log.info('SERVER_CALL_TYPE.START_PACKET_STREAM');
+				Log.info('SERVER_CALL_TYPE.START_PACKET_STREAM ::: ',serverCallObj);
 
 				//Tell targets clients to go into listen mode
+				await SocketClient.get().AllTargetClientsListenMode(serverCallObj);
+				
 				//Show CountDown on my clients
+				await SocketClient.get().AllMyClientsShowCountDown(3);
 
 			//LOOP
-				//Tell targets to send the packet
-				//Tell targets that they received a packet
+				let streamResponses:ServerResponseMessageObj[] = [];
 
-				//Tell my clients to show the results
+				let streamTotalTime:number = 0; 
+				let streamTotalCalls:number = 0;
+
+				for(let streamX:number=0; streamX<serverCallObj.data.numPackets; streamX++)
+				{
+					Log.info('________');
+					Log.info('________');
+					Log.info('________');
+					Log.info('________ STREAM PACKET ::::: streamX='+streamX);
+
+					serverCallObj.data.deltaCallType = serverCallObj.callType;
+					serverCallObj.callType = SERVER_CALL_TYPE.PING;
+					
+					let streamResponse:ServerResponseMessageObj[] = await SocketClient.get().CallAnotherServer(serverCallObj);
+					
+					streamResponse.forEach((sResponse:ServerResponseMessageObj) => {
+						streamResponses.push(sResponse);
+						streamTotalCalls++;
+						streamTotalTime += sResponse.callTime;
+					});
+					responseObj.data = {totalCalls:streamTotalCalls,totalTime:streamTotalTime};
+					responseObj.message = "pinged : "+streamTotalCalls+"   took : "+streamTotalTime+" ms";
+
+					//Tell targets that they received a packet
+					let serverCallObjReceived2:ServerCallMessageObj = {
+						...serverCallObj,
+						callType:SERVER_CALL_TYPE.RELAY_TO_ALL_CLIENTS,
+						data: {
+							...serverCallObj.data,
+							clientState:CLIENT_NODE_ACTION_STATE.RECEIVED,
+							message:"I received a ping from"+server_alias,
+							delta:server_alias,
+							streamResponses: streamResponses
+						}
+					};
+					await SocketClient.get().CallAnotherServer(serverCallObjReceived2);
+					Log.info('________');
+					Log.info('________');
+					Log.info('________END STREAM PACKET ::::: streamX='+streamX);
+					Log.info('________');
+					Log.info('________');
+				}
+
+				// await MiscUtils.GhettoWait(1000);
+
+				await SocketClient.get().AllMyClientsShowResults(streamResponses);
 
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Packet Stream Started"} as ServerResponseMessageObj;
 			break;
@@ -180,10 +199,10 @@ wss.on('connection', (ws) => {
 					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
 					clientState: serverCallObj.data.clientState,
 					delta: serverCallObj.data.delta,
-					message: serverCallObj.data.message
+					message: serverCallObj.data.message,
+					data: serverCallObj.data
 				};
-				Log.info('relay deez nuts 1 : ',clientMessage2);
-				await SocketClient.get().SendToAllClients(wss,clientMessage2);
+				await SocketClient.get().SendToAllClients(clientMessage2);
 				
 				break;
 
