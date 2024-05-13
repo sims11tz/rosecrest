@@ -1,22 +1,23 @@
 version: '3.8'
 
 x-common-variables: &common-variables
-  REACT_APP_SERVER_PORT: 7000
-  SERVICE_LIST: "server_geurts_home,server_aws_california,server_aws_ohio,server_aws_brazil,server_aws_dublin,server_aws_tokyo,server_aws_paris"
+  REACT_APP_SERVER_PORT: 7002
+  SERVER_LIST: "server_geurts_home,server_aws_california,server_aws_ohio,server_aws_brazil,server_aws_dublin,server_aws_tokyo,server_aws_paris"
   server_geurts_home_ip: 172.32.0.3
   server_geurts_home_port: 7003
-  server_aws_california: 172.32.0.4
+  server_aws_california_ip: 172.32.0.4
   server_aws_california_port: 7004
-  server_aws_ohio: 172.32.0.5
+  server_aws_ohio_ip: 172.32.0.5
   server_aws_ohio_port: 7005
-  server_aws_brazil: 172.32.0.6
-  server_aws_brazil_port: 7006
-  server_aws_dublin: 172.32.0.7
-  server_aws_dublin_port: 7007
-  server_aws_tokyo: 172.32.0.8
-  server_aws_tokyo_port: 7008
-  server_aws_paris: 172.32.0.9
-  server_aws_paris_port: 7009
+  server_aws_paris_ip: 172.32.0.6
+  server_aws_paris_port: 7006
+  server_aws_tokyo_ip: 172.32.0.7
+  server_aws_tokyo_port: 7007
+  server_aws_dublin_ip: 172.32.0.8
+  server_aws_dublin_port: 7008
+  server_aws_brazil_ip: 172.32.0.9
+  server_aws_brazil_port: 7009
+  
 
 networks:
   my-network:
@@ -37,11 +38,12 @@ services:
     container_name: client_container
     networks:
       my-network:
-        ipv4_address: 172.32.0.1
+        ipv4_address: 172.32.0.2
     environment:
       <<: *common-variables
+      REACT_APP_SERVER_LIST: "server_geurts_home,server_aws_california,server_aws_ohio,server_aws_brazil,server_aws_dublin,server_aws_tokyo,server_aws_paris"
     ports:
-      - 7001:7001
+      - 7001:7002
     volumes:
       - ./client/src:/app/client/src
       - ./client/public:/app/client/public
@@ -62,10 +64,18 @@ services:
       - ./shared:/app/shared
     environment:
       <<: *common-variables
+      SERVER_ALIAS: server_geurts_home
       LOCATION: Geurts_House
-      LATENCY: 5
+      LATENCY: 50
     ports:
       - 7003:7002
+    links:
+      - server2
+      - server3
+      - server4
+      - server5
+      - server6
+      - server7
     command: npm start
     stdin_open: true
 
@@ -82,8 +92,9 @@ services:
       - ./shared:/app/shared
     environment:
       <<: *common-variables
+      SERVER_ALIAS: server_aws_california
       LOCATION: USA_California
-      LATENCY: 15
+      LATENCY: 725
     ports:
       - 7004:7002
     command: npm start
@@ -102,8 +113,9 @@ services:
       - ./shared:/app/shared
     environment:
       <<: *common-variables
+      SERVER_ALIAS: server_aws_ohio
       LOCATION: USA_Ohio
-      LATENCY: 10
+      LATENCY: 1245
     ports:
       - 7005:7002
     command: npm start
@@ -122,8 +134,9 @@ services:
       - ./shared:/app/shared
     environment:
       <<: *common-variables
+      SERVER_ALIAS: server_aws_paris
       LOCATION: Europe_France_Paris
-      LATENCY: 45
+      LATENCY: 1845
     ports:
       - 7006:7002
     command: npm start
@@ -142,8 +155,9 @@ services:
       - ./shared:/app/shared
     environment:
       <<: *common-variables
+      SERVER_ALIAS: server_aws_tokyo
       LOCATION: Asia_Japan_Tokyo
-      LATENCY: 30
+      LATENCY: 3003
     ports:
       - 7007:7002
     command: npm start
@@ -162,8 +176,9 @@ services:
       - ./shared:/app/shared
     environment:
       <<: *common-variables
+      SERVER_ALIAS: server_aws_dublin
       LOCATION: Europe_Ireland_Dublin
-      LATENCY: 200
+      LATENCY: 2321
     ports:
       - 7008:7002
     command: npm start
@@ -182,8 +197,9 @@ services:
       - ./shared:/app/shared
     environment:
       <<: *common-variables
+      SERVER_ALIAS: server_aws_brazil
       LOCATION: SouthAmerica_Brazil_SaoPaulo
-      LATENCY: 100
+      LATENCY: 986
     ports:
       - 7009:7002
     command: npm start

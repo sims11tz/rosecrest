@@ -1,0 +1,67 @@
+.serverNode {
+	flex: 0 1 30%;
+	margin: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	border: solid 1px #000;
+}
+
+.serverNodeContent
+{
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.serverNodeStatus
+{
+	font-weight: bold;
+	font-size: 35px;
+}
+
+.serverNodeStatus.UNKNOWN
+{
+	color:#000;
+}
+
+.serverNodeStatus.ERROR
+{
+	color:red;
+}
+
+.serverNodeStatus.CONNECTED
+{
+	color:green;
+}
+
+.serverNodeStatus.DISCONNECTED
+{
+	color:red;
+}
+
+.serverNodeTools
+{
+	display: flex;
+	flex-direction: column;
+}
+
+.serverNodeToolsList
+{
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+}
+
+.serverToolPair
+{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}

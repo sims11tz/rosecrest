@@ -1,68 +1,18 @@
-import { ReactElement } from "react";
-
 export enum CUSTOM_EVENTS {
-	SRTING_TYPES_DRAGGING_STARTED = 'SRTING_TYPES_DRAGGING_STARTED',
-	STRING_TYPES_DRAGGING_ENDED = 'STRING_TYPES_DRAGGING_ENDED',
-	STRING_TYPES_DOUBLE_CLICK = 'STRING_TYPES_DOUBLE_CLICK',
-	TRANSACTIONS_EXPANDER_CHANGE = 'TRANSACTIONS_EXPANDER_CHANGE',
-	CHART_GROUP_BY_CHANGE = 'CHART_GROUP_BY_CHANGE',
-	CHART_TYPES_CHANGE = 'CHART_TYPES_CHANGE',
+	CUSTOM_EVENT = 'CUSTOM_EVENT',
+	SOCKER_SERVER_OPEN = 'SOCKER_SERVER_OPEN',
+	SOCKER_SERVER_ERROR = 'SOCKER_SERVER_ERROR',
+	SOCKER_SERVER_CLOSED = 'SOCKER_SERVER_CLOSED',
+	ALL_CONNECT = 'ALL_CONNECT',
+	ALL_DISCONNECT = 'ALL_DISCONNECT',
+	ALL_PING = 'ALL_PING',
 }
 
-export enum TRANSACTIONS_VIEW_MODES {
-	EXPANDED = 'expanded',
-	PEAKING = 'peaking',
-	CLOSED = 'closed'
-}
-
-export enum CHART_GROUP_BY_MODES {
-	DAY = 'day',
-	WEEK = 'week',
-	MONTH = 'month',
-	YEAR = 'year'
-}
-
-export enum CHART_TYPES {
-	LINE_OVER_TIME = 'lineovertime',
-	PIE = 'pie',
-	BAR = 'bar',
-}
-
-export interface DragAssocObj {
-	id:number;
-	name:string;
-	endpoint:string;
-}
-
-export interface ContextMenuItem {
-	name:string;
-	event:string;
-	eventObj:any;
-	reactElement?:ReactElement;
-}
-
-export enum DRAG_TYPPES {
-	ASSOC_OBJ = 'ASSOC_OBJ'
-}
-
-export enum CHIP_SIZES{
-	small = 'small',
-	medium = 'medium',
-	large = 'large'
-}
-
-export enum CHIP_TYPES {
-	groups = 'groups',
-	tags = 'tags'
-}
-
-export function stringToChipType(str:string):CHIP_TYPES {
-	switch(str)
-	{
-		case 'groups': return CHIP_TYPES.groups;
-		case 'tags': return CHIP_TYPES.tags;
-		default: return CHIP_TYPES.groups;
-	}
+export enum SERVER_NODE_STATE {
+	UNKNOWN = 'UNKNOWN',
+	ERROR = 'ERROR',
+	CONNECTED = 'CONNECTED',
+	DISCONNECTED = 'DISCONNECTED',
 }
 
 export enum LIGHT_COLORS
@@ -101,7 +51,7 @@ export enum LIGHT_COLORS
 	Platinum = '#E5E4E2',
 }
 
-export class CHIP_COLORS {
+export class LIGHT_COLORS_SET {
 
 	private static _cachedLightColors:LIGHT_COLORS[] = [];
 	public static GetColors():LIGHT_COLORS[]
@@ -121,9 +71,8 @@ export class CHIP_COLORS {
 		return this._cachedLightColors;
 	}
 
-	public static GetColor(type:CHIP_TYPES,idx:number):LIGHT_COLORS
+	public static GetColor(idx:number):LIGHT_COLORS
 	{
-		if(type === CHIP_TYPES.tags) idx += 15;
 		return this.GetColors()[(idx < this.GetColors().length-1)?idx:0];
 	}
 	

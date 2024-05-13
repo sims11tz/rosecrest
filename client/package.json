@@ -32,6 +32,7 @@
 		"react-refresh-webpack-plugin": "^0.1.0",
 		"react-router-dom": "^6.22.3",
 		"react-scripts": "^5.0.1",
+		"socket.io-client": "^4.7.5",
 		"ts-loader": "^9.5.1",
 		"tsconfig-paths": "^4.2.0",
 		"tsconfig-paths-webpack-plugin": "^4.1.0",
@@ -40,8 +41,8 @@
 		"yarn": "^1.22.22"
 	},
 	"scripts": {
-		"start": "nodemon -L --exec 'PORT=3000 react-app-rewired start' --openssl-legacy-provider --ignore 'public/' -e ts,tsx,js,jsx,mjs,cjs,json,css",
-		"startWindows": "nodemon -L --exec \"cross-env BROWSER=none PORT=3001 react-app-rewired start\" --openssl-legacy-provider --ignore public/ -e ts,tsx,js,jsx,mjs,cjs,json,css",
+		"start": "nodemon -L --exec 'PORT=6999 react-app-rewired start' --openssl-legacy-provider --ignore 'public/' -e ts,tsx,js,jsx,mjs,cjs,json,css",
+		"startWindows": "nodemon -L --exec \"cross-env BROWSER=none PORT=7000 react-app-rewired start\" --openssl-legacy-provider --ignore public/ -e ts,tsx,js,jsx,mjs,cjs,json,css",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject"
