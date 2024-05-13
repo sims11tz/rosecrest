@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, type FC } from 'react'
-import { SendPacketObj, SERVER_CALL_TYPE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from '@shared/DataTypes';
+import { SendPacketObj, SERVER_CALL_TYPE, SERVER_NODE_STATE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from '@shared/DataTypes';
 import Button from '@mui/material/Button';
 import SocketController from 'controllers/SocketController';
-import { CUSTOM_EVENTS, SERVER_NODE_STATE } from 'dataTypes/ClientDataTypes';
+import { CUSTOM_EVENTS } from 'dataTypes/ClientDataTypes';
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import AppController from 'controllers/AppController';
 
@@ -25,8 +25,12 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 
 	useEffect(() => { 
 
-		
-		setAllString(AppController.get().Servers.map(serverObj => serverObj.alias).join(','));
+		let allStringBuild:string='';
+		AppController.get().Servers.map((serverObjIn: ServerObj) => {
+			if (serverObjIn.alias === serverObj!.alias){ return null; }
+			allStringBuild += serverObjIn.alias+',';
+		});
+		setAllString(allStringBuild.slice(0, -1));
 
 		window.addEventListener(CUSTOM_EVENTS.SOCKET_SERVER_OPEN, onServerOpen);
 		window.addEventListener(CUSTOM_EVENTS.SOCKET_SERVER_CLOSED, onServerClosed);
@@ -35,6 +39,7 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 		window.addEventListener(CUSTOM_EVENTS.ALL_CONNECT, onAllConnect);
 		window.addEventListener(CUSTOM_EVENTS.ALL_DISCONNECT, onAllDisconnect);
 		window.addEventListener(CUSTOM_EVENTS.ALL_PING, onAllPing);
+		window.addEventListener(CUSTOM_EVENTS.ALL_RESET, onAllReset);
 		
 	
 		return () => {
@@ -45,6 +50,7 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 			window.removeEventListener(CUSTOM_EVENTS.ALL_CONNECT, onAllConnect);
 			window.removeEventListener(CUSTOM_EVENTS.ALL_DISCONNECT, onAllDisconnect);
 			window.removeEventListener(CUSTOM_EVENTS.ALL_PING, onAllPing);
+			window.removeEventListener(CUSTOM_EVENTS.ALL_RESET, onAllReset);
 		};
 
 	}, []);
@@ -55,7 +61,7 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 		setClickCount(clickCount+1);
 
 		let callObj:ServerCallMessageObj = {callId:SocketController.get().callId, callType: callType};
-		if(callType === SERVER_CALL_TYPE.CONNECT || callType === SERVER_CALL_TYPE.DISCONNECT)
+		if(callType === SERVER_CALL_TYPE.CONNECT || callType === SERVER_CALL_TYPE.DISCONNECT || callType === SERVER_CALL_TYPE.RESET)
 		{
 			setServerActionsSent("");
 			setServerActionsReceived("");
@@ -95,6 +101,10 @@ export const ServerComponent: FC<ServerComponentProps> = ({ serverObj }) => {
 	
 	const onAllPing = (event:Event) => {
 		onClickButton(SERVER_CALL_TYPE.PING);
+	};
+
+	const onAllReset = (event:Event) => {
+		onClickButton(SERVER_CALL_TYPE.RESET);
 	};
 
 	const onServerOpen = (event:Event) => {

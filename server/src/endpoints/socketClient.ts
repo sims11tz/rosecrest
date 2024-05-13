@@ -1,5 +1,5 @@
 import { SendPacketObj, SERVER_CALL_TYPE, SERVER_RESPONSE_TYPE, ServerCallMessageObj, ServerResponseMessageObj } from "@shared/DataTypes";
-import WebSocket from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 import Log from "../utils/Log";
 
 export class SocketClient {
@@ -7,7 +7,7 @@ export class SocketClient {
 	public static get(): SocketClient { if (!SocketClient.instance) { SocketClient.instance = new SocketClient(); } return SocketClient.instance; }
 	constructor() {};
 	
-	public Call(serverCallObj: ServerCallMessageObj): Promise<ServerResponseMessageObj[]>
+	public CallAnotherServer(serverCallObj: ServerCallMessageObj): Promise<ServerResponseMessageObj[]>
 	{
 		return new Promise(async (resolve, reject) => {
 			let sendPacketObj: SendPacketObj = serverCallObj.data as SendPacketObj;
@@ -37,13 +37,20 @@ export class SocketClient {
 
 			wsc.on('open', () => {
 				try {
-					let packetObj: ServerCallMessageObj = {
-						callId: 1,
-						callType: SERVER_CALL_TYPE.PING,
-						data: {}
-					};
+					// let packetObj: ServerCallMessageObj = {
+					// 	callId: 1,
+					// 	callType: serverCallObj.callType,
+					// 	data: {}
+					// };
 					startTime = Date.now();
-					wsc.send(JSON.stringify(packetObj));
+					
+					// Log.info("_________"+process.env.SERVER_ALIAS+"__________________");
+					// Log.info("___________________________");
+					// Log.info("___________________________");
+					// Log.info("___________________________ target = ",target);
+					// Log.info("_________"+process.env.SERVER_ALIAS+"__________________send serverCallObj:",serverCallObj);
+
+					wsc.send(JSON.stringify(serverCallObj));
 
 				} catch (error) {
 					console.error('Error opening WebSocket:', error);
@@ -54,13 +61,23 @@ export class SocketClient {
 
 			wsc.on('message', (message: string) => {
 				try {
+
+					// Log.info("___________"+process.env.SERVER_ALIAS+"________________onMessage() "+message);
+
 					const serverResponseMessageObj: ServerResponseMessageObj = JSON.parse(message);
-					if ([SERVER_RESPONSE_TYPE.MESSAGE].includes(serverResponseMessageObj.responseType)) {
+					serverResponseMessageObj.target = target;
+					if ([SERVER_RESPONSE_TYPE.MESSAGE,SERVER_RESPONSE_TYPE.CLIENT_MESSAGE].includes(serverResponseMessageObj.responseType)) {
+
+						// Log.info("_________"+process.env.SERVER_ALIAS+"__________________onMessage() IN ");
 
 						serverResponseMessageObj.callTime = Date.now() - startTime;
+
 						resolve(serverResponseMessageObj);
 						wsc.close();
-
+					}
+					else
+					{
+						// Log.info("__________"+process.env.SERVER_ALIAS+"_________________onMessage() OUT ");
 					}
 				} catch (error) {
 					console.error('Error handling message:', error);
@@ -76,8 +93,29 @@ export class SocketClient {
 			});
 
 			wsc.on('close', () => {
-				console.log('Disconnected from the server');
+				// console.log('Disconnected from the server');
 			});
+		});
+	}
+
+	public async SendToAllClients(wss:WebSocketServer, clientMessage: ServerResponseMessageObj)
+	{
+		// Log.info('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SendToAllClients %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+
+		return new Promise((resolve, reject) => {
+
+			// Log.info(' SendToAllClients.Promise()');
+			let idx:number = 0;
+			wss.clients.forEach(client => {
+				idx++;
+				if (client.readyState === WebSocket.OPEN)
+				{
+					client.send(JSON.stringify(clientMessage));
+				}
+			});
+
+			// Log.info(' RESOLVE.............'+idx);
+			resolve({message:'sent to '+idx+' clients'});
 		});
 	}
 }

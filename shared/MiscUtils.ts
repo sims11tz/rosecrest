@@ -66,4 +66,10 @@ export default class MiscUtils {
 		date.setDate(date.getDate() + 4 - dayNum);
 		return date.getFullYear();
 	}
+
+	public static FormatMilliseconds(ms: number): string {
+		const seconds = Math.floor(ms / 1000);
+		const milliseconds = ms % 1000;
+		return `${seconds}s ${milliseconds}ms`;
+	}
 }

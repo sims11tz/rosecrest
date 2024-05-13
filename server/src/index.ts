@@ -3,7 +3,7 @@ import express, { Request, Response } from "express";
 import Log from "./utils/Log";
 import { NETWORK_ENDPOINTS, NETWORK_COMMANDS, NETWORK_PAYLOAD, NETWORK_STATUS_CODES, NETWORK_ERROR_PAYLOAD, NETWORK_PAYLOAD_TYPES, NETWORK_PAYLOAD_NONE } from "@shared/SharedNetworking";
 import MiscUtils from "@shared/MiscUtils";
-import {ServerResponseMessageObj, SERVER_RESPONSE_TYPE, ServerCallMessageObj, SendPacketObj, SERVER_CALL_TYPE} from "@shared/DataTypes";
+import {ServerResponseMessageObj, SERVER_RESPONSE_TYPE, ServerCallMessageObj, SendPacketObj, SERVER_CALL_TYPE, CLIENT_NODE_ACTION_STATE} from "@shared/DataTypes";
 import { BeaconEP } from "./endpoints/BeaconEP";
 import { Server as WebSocketServer, WebSocket } from 'ws';
 import { createServer, Server as HttpServer } from 'http';
@@ -39,101 +39,131 @@ Log.info("<"+server_alias+"> latency : "+latency);
 // Create a single HttpServer from the express app
 const httpServer = createServer(app);
 
+function ghettoWait(ms:number) { 
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Initialize the WebSocket on the HttpServer
 const wss = new WebSocketServer({ server: httpServer });
 wss.on('connection', (ws) => {
 	ws.on('message', async (message) => {
-		Log.info(`${server_alias} Received: ${message}`);
+		// Log.info(`${server_alias} Received: ${message}`);
 		let serverCallObj:ServerCallMessageObj = JSON.parse(message.toString());
-		Log.info(' serverCallObj : ',serverCallObj);
+		// Log.info(' serverCallObj : ',serverCallObj);
 
 		let responseObj:ServerResponseMessageObj = { callId:serverCallObj.callId } as ServerResponseMessageObj;
 		switch(serverCallObj.callType)
 		{
 			case SERVER_CALL_TYPE.CONNECT:
-				Log.info('SERVER_CALL_TYPE.CONNECT');
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.WELCOME,message:"Welcome to the server"} as ServerResponseMessageObj;
 			break;
 
 			case SERVER_CALL_TYPE.PING:
-				Log.info('SERVER_CALL_TYPE.PING');
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"pong"} as ServerResponseMessageObj;
 			break;
 
 			case SERVER_CALL_TYPE.DISCONNECT:
-				Log.info('SERVER_CALL_TYPE.DISCONNECT');
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Goodbye"} as ServerResponseMessageObj;
 
 				wss.clients.forEach((client: WebSocket) => {
-					Log.info(' close client please....');
 					client.close();
 				});
 			break;
 
-			case SERVER_CALL_TYPE.SEND_PACKET:
-				Log.info('SERVER_CALL_TYPE.SEND_PACKET');
-				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Packet sent"} as ServerResponseMessageObj;
+			case SERVER_CALL_TYPE.RESET:
+				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Reset"} as ServerResponseMessageObj;
 
-				//PREP
-					// Tell my clients to go into ready mode
-					// Tell the target to go into waiting mode
-					// Do a countdown and have my clients show the countdown
-					// SHOW SENDING
-					// SHOW target when it gets stuff.... just add prop to ping
-
-				Log.info('');
-				Log.info('');
-				Log.info('');
-				Log.info('___________________________________________ SEND TO CLIENTS ______________');
-
-				let startMessage:ServerResponseMessageObj = {
+				let clientResetMessage:ServerResponseMessageObj = {
 					callId: -1,
 					callTime: 0,
 					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
-					message: "Starting packet send operation"
+					clientState: CLIENT_NODE_ACTION_STATE.RESET,
+					message: "reset your state please..."
 				};
+				await SocketClient.get().SendToAllClients(wss,clientResetMessage);
+			break;
 
-				let idx:number = 0;
-				wss.clients.forEach(client => {
-					idx++;
-					Log.info('client <'+server_alias+'>  <'+idx+'>__________________________ ');
-					if (client.readyState === WebSocket.OPEN) {
-						Log.info('sending start message to client '+client.url);
+			case SERVER_CALL_TYPE.SEND_PACKET:
+				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Packet sent"} as ServerResponseMessageObj;
 
-						client.send(JSON.stringify(startMessage));
+			//Tell targets clients to go into listen mode
+				let serverCallObjListening:ServerCallMessageObj = {
+					...serverCallObj,
+					callType:SERVER_CALL_TYPE.RELAY_TO_ALL_CLIENTS,
+					data: {
+						...serverCallObj.data,
+						clientState:CLIENT_NODE_ACTION_STATE.LISTENING,
+						message:"listen mode please"
 					}
-					else
-					{
-						Log.info('CANT SEND MESSAGE');
-					}
-				});
-
-
-				Log.info('____________________ DONE <'+idx+'>___________________');
-				Log.info('');
-				Log.info('');
-
-				let wsResponses:ServerResponseMessageObj[] = await SocketClient.get().Call(serverCallObj);
-
+				};
+				await SocketClient.get().CallAnotherServer(serverCallObjListening);
 				
-				Log.info('wsResponses['+wsResponses.length+'] : ',wsResponses);
+			//Show CountDown on my clients
+				let clientMessage:ServerResponseMessageObj = {
+					callId: -1,
+					callTime: 0,
+					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
+					clientState: CLIENT_NODE_ACTION_STATE.COUNTDOWN,
+					clientData: {countdown:5},
+					message: "preparing packet send operation"
+				};
+				for(let x:number=2; x>=0; x--)
+				{
+					await ghettoWait(1000);
+					clientMessage.clientData = {countdown:x};
+					await SocketClient.get().SendToAllClients(wss,clientMessage);
+				}
 
+			//Tell targets to send the packet
+				serverCallObj.callType = SERVER_CALL_TYPE.PING;
+				let wsResponses:ServerResponseMessageObj[] = await SocketClient.get().CallAnotherServer(serverCallObj);
 				let totalTime:number = 0;
 				let totalCalls:number =0;
 				wsResponses.forEach((wsResponse:ServerResponseMessageObj) => {
 					totalCalls++;
 					totalTime += wsResponse.callTime;
 				});
-
 				responseObj.data = {totalCalls:totalCalls,totalTime:totalTime};
 				responseObj.message = "pinged : "+totalCalls+"   took : "+totalTime+" ms";
 
-				//Tell my clients to show the results
+			//Tell targets that they received a packet
+				let serverCallObjReceived:ServerCallMessageObj = {
+					...serverCallObj,
+					callType:SERVER_CALL_TYPE.RELAY_TO_ALL_CLIENTS,
+					data: {
+						...serverCallObj.data,
+						clientState:CLIENT_NODE_ACTION_STATE.RECEIVED,
+						message:"I received a ping from"+server_alias,
+						delta:server_alias
+					}
+				};
+				await SocketClient.get().CallAnotherServer(serverCallObjReceived);
+
+			//Tell my clients to show the results
+				let clientResultsMessage:ServerResponseMessageObj = {
+					callId: -1,
+					callTime: 0,
+					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
+					clientState: CLIENT_NODE_ACTION_STATE.RESULTS,
+					clientData: {countdownResults:wsResponses},
+					message: "preparing packet send operation"
+				};
+				await SocketClient.get().SendToAllClients(wss,clientResultsMessage);
 
 			break;
 
 			case SERVER_CALL_TYPE.START_PACKET_STREAM:
 				Log.info('SERVER_CALL_TYPE.START_PACKET_STREAM');
+
+				//Tell targets clients to go into listen mode
+				//Show CountDown on my clients
+
+			//LOOP
+				//Tell targets to send the packet
+				//Tell targets that they received a packet
+
+				//Tell my clients to show the results
+
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Packet Stream Started"} as ServerResponseMessageObj;
 			break;
 
@@ -141,6 +171,21 @@ wss.on('connection', (ws) => {
 				Log.info('SERVER_CALL_TYPE.END_PACKET_STREAM');
 				responseObj = {responseType:SERVER_RESPONSE_TYPE.MESSAGE,message:"Packet Stream Ended"} as ServerResponseMessageObj;
 			break;
+
+			case SERVER_CALL_TYPE.RELAY_TO_ALL_CLIENTS:
+
+				let clientMessage2:ServerResponseMessageObj = {
+					callId: -1,
+					callTime: 0,
+					responseType: SERVER_RESPONSE_TYPE.CLIENT_MESSAGE,
+					clientState: serverCallObj.data.clientState,
+					delta: serverCallObj.data.delta,
+					message: serverCallObj.data.message
+				};
+				Log.info('relay deez nuts 1 : ',clientMessage2);
+				await SocketClient.get().SendToAllClients(wss,clientMessage2);
+				
+				break;
 
 		}
 
@@ -150,7 +195,7 @@ wss.on('connection', (ws) => {
 			delay = parseInt(latency);
 		}
 
-		Log.info('('+server_alias+') _________________________ DELAY : '+delay);
+		// Log.info('('+server_alias+') _________________________ DELAY : '+delay);
 
 		setTimeout(() => {
 			responseObj.callId = serverCallObj.callId;

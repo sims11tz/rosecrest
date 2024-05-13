@@ -79,6 +79,12 @@
 	text-align: center;
 }
 
+.countDownNumber
+{
+	font-size: 50px;
+	font-weight: bold;
+}
+
 .ERROR .clientStatusTitle
 {
 	color: red;
@@ -124,27 +130,32 @@
 	color: red;
 }
 
-.NONE .clientStatusContent
+.clientStatusContent.NONE
 {
-	background-color: lime;
+	background-color: lightslategray;
 }
 
-.COUNTDOWN .clientStatusContent
+.clientStatusContent.COUNTDOWN
 {
 	background-color: yellow;
 }
 
-.LISTENING .clientStatusContent
+.clientStatusContent.LISTENING
 {
 	background-color: lightsalmon;
 }
 
-.SENDING .clientStatusContent
+.clientStatusContent.SENDING
+{
+	background-color: lightseagreen;
+}
+
+.clientStatusContent.RECEIVED
 {
 	background-color: lightgreen;
 }
 
-.RESULTS .clientStatusContent
+.clientStatusContent.RESULTS
 {
-	background-color: lightpink;
+	background-color: lightgreen;
 }

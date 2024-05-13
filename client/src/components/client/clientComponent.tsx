@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Button } from "@mui/material";
-import { CLIENT_NODE_ACTION_STATE, CLIENT_NODE_STATE, CUSTOM_EVENTS } from "dataTypes/ClientDataTypes";
+import { CUSTOM_EVENTS } from "dataTypes/ClientDataTypes";
 import SocketController from "controllers/SocketController";
-import { SERVER_CALL_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from "@shared/DataTypes";
+import { CLIENT_NODE_ACTION_STATE, CLIENT_NODE_STATE, SERVER_CALL_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from "@shared/DataTypes";
 import AppController from "controllers/AppController";
 
 import './clientComponent.css';
+import MiscUtils from "@shared/MiscUtils";
 
 
 function ClientComponent() {
@@ -28,7 +29,7 @@ function ClientComponent() {
 	}, [clientStatus]);
 
 	const [clientActionState,setClientActionState] = useState<CLIENT_NODE_ACTION_STATE>(CLIENT_NODE_ACTION_STATE.NONE);
-	const [clientStatusContent,setClientStatusContent] = useState<string>('');
+	const [clientStatusContent,setClientStatusContent] = useState<ReactNode>(<div></div>);
 	const [clientStatusTitle,setClientStatusTitle] = useState<string>('');
 	
 	
@@ -50,17 +51,15 @@ function ClientComponent() {
 		const foundServerObj = AppController.get().Servers.find(serverObj => serverObj.alias === clientId);
 		if (foundServerObj) {
 			setServerObj(foundServerObj);
-
-			// const intervalId = setInterval(heartBeat, 3000);
-
+			// const intervalId = setInterval(() => {
+			// 	console.log('interval... : '+heartBeatIdx);
+			// 	setHeartBeatIdx(heartBeatIdx+1);
+			// }, 2000);
 
 		} else {
-			console.error("Server with the provided alias not found");
 			setClientStatus(CLIENT_NODE_STATE.ERROR);
 			setClientStatusTitle('Could not locate server alias...');
-
-			setConsoleStr('ERROR - bad alias = '+clientId);
-			
+			setConsoleStr('ERROR - bad alias = '+clientId);	
 		}
 
 		window.addEventListener(CUSTOM_EVENTS.SOCKET_SERVER_OPEN, onServerOpen);
@@ -81,11 +80,135 @@ function ClientComponent() {
 
 	}, []);
 
+	const heartBeatIdx = useRef(0);
+	useEffect(() => {
+		const intervalId = setInterval(() => {
+			heartBeatIdx.current += 1;
+			setHeartBeatIdx2(heartBeatIdx.current);
+		}, 2000);
+	
+		return () => clearInterval(intervalId);
+	}, []);
+
+	const [heartBeatIdx2,setHeartBeatIdx2] = useState<number>(0);
+	const heartBeat = () => {
+		// setHeartBeatIdx(prevHeartBeatIdx => {
+			const newHeartBeatIdx = heartBeatIdx.current;
+	
+			let heartStr = newHeartBeatIdx % 2 === 0 ? 'on' : 'off';
+			setConsoleStr('heart beat <' + newHeartBeatIdx + '/'+heartBeatIdx2+'> - ' + heartStr+' - clientStatus='+clientStatusRef.current);
+
+			if(clientStatusRef.current === CLIENT_NODE_STATE.INITIALIZING || clientStatusRef.current === CLIENT_NODE_STATE.DISCONNECTED)
+			{
+				let callObj:ServerCallMessageObj = {callId:SocketController.get().callId, callType: SERVER_CALL_TYPE.CONNECT};
+				
+				setClientActionState(CLIENT_NODE_ACTION_STATE.NONE);
+				setClientStatusContent(<div></div>);
+				
+				SocketController.get().sendMessage(serverObj, callObj, (response:ServerResponseMessageObj) => {
+	
+					console.log('...... RECEIVED ---- ('+serverObj.alias+') response : ',response);
+
+					setConsoleStr('heart beat <' + newHeartBeatIdx + '/'+heartBeatIdx2+'> - ' + heartStr+' - clientStatus='+clientStatusRef.current);
+
+					// setServerActionsReceived("received <"+response.callId+"> : "+response.responseType+" -- "+response.message+" ");
+					
+				});
+			}
+
+			// return newHeartBeatIdx; // return the updated index for the next state
+		// });
+	}
+
+	useEffect(() => {		
+		if((clientStatus === CLIENT_NODE_STATE.INITIALIZING && heartBeatIdx.current < 1) || clientStatus === CLIENT_NODE_STATE.DISCONNECTED )
+		{
+			heartBeat();
+		}
+	},[clientStatus,heartBeatIdx2]);
+
+
+	// export enum CLIENT_NODE_ACTION_STATE {
+	// 	NONE = 'NONE',
+	// 	COUNTDOWN = 'COUNTDOWN',
+	// 	LISTENING = 'LISTENING',
+	// 	SENDING = 'SENDING',
+	// 	RECEIVED = 'RECEIVED',
+	// 	RESULTS = 'RESULTS',
+	// }
+
 	const onClientMessage = (event:Event) => {
 		let ce:CustomEvent = event as CustomEvent;
 
-		console.log(' ______________________________ HERE IT IS ___________ ');
-		console.log(' onClientMessage : ',ce.detail);
+		// console.log(' ______________________________ HERE IT IS ___________ ');
+		// console.log(' onClientMessage : ',ce.detail);
+
+		if(ce.detail.clientState === CLIENT_NODE_ACTION_STATE.RESET)
+		{
+			setClientActionState(CLIENT_NODE_ACTION_STATE.NONE);
+			setClientStatusContent(
+				<div></div>);
+			return;
+		}
+
+		setClientActionState(ce.detail.clientState);
+		switch(ce.detail.clientState)
+		{
+			case CLIENT_NODE_ACTION_STATE.LISTENING:
+				setClientStatusContent(
+				<div>
+					<h1>Listening.....</h1>
+				</div>);
+			break;
+
+			case CLIENT_NODE_ACTION_STATE.COUNTDOWN:
+				setClientStatusContent(
+					<div>
+						<h1>COUNT DOWN</h1>
+						<div className="countDownNumber">{ce.detail.clientData.countdown}</div>
+					</div>);
+			break;
+
+			case CLIENT_NODE_ACTION_STATE.RECEIVED:
+
+
+				setClientStatusContent(
+					<div>
+						<h1>RECEIVED PING</h1>
+						<div>{ce.detail.message}</div>
+					</div>);
+			break;
+
+			case CLIENT_NODE_ACTION_STATE.RESULTS:
+
+				let totalTime:number = 0;
+				let totalCalls:number =0;
+				ce.detail.clientData.countdownResults.forEach((wsResponse:ServerResponseMessageObj) => {
+					totalCalls++;
+					totalTime += wsResponse.callTime;
+				});
+
+				setClientStatusContent(
+					<div>
+						<h1>RESULTS</h1>
+						<div className="countDownResults">
+							<div>
+								{ce.detail.clientData.countdownResults.map((obj:ServerResponseMessageObj, index:number) => (
+									<div key={"countDownResults_"+index}>
+										<div>{serverObj.alias} called {obj.target} and took {MiscUtils.FormatMilliseconds(obj.callTime)}</div>
+									</div>
+								))}
+							</div>
+							<div>&nbsp;</div>
+							<div>
+								<div>Total Calls : {totalCalls}</div>
+								<div>Total Time : {MiscUtils.FormatMilliseconds(totalTime)}</div>
+							</div>
+						</div>
+					</div>);
+			break;
+		}
+		
 
 		setConsoleStr('received <'+ce.detail.callId+'> : '+ce.detail.responseType+' -- '+ce.detail.message+' ');
 	}
@@ -96,8 +219,6 @@ function ClientComponent() {
 		
 		if(clientStatusRef.current === CLIENT_NODE_STATE.INITIALIZING || clientStatusRef.current === CLIENT_NODE_STATE.DISCONNECTED)
 		{
-			console.log(' in ');
-			
 			setClientStatus(CLIENT_NODE_STATE.CONNECTED);
 			setClientStatusTitle(' CONNECTED :) ');
 		}
@@ -119,38 +240,7 @@ function ClientComponent() {
 		setClientStatusTitle('ERROR...'+ce.detail.message);
 	};
 
-	const [heartBeatIdx,setHeartBeatIdx] = useState<number>(0);
-	const heartBeat = () => {
-		setHeartBeatIdx(prevHeartBeatIdx => {
-			const newHeartBeatIdx = prevHeartBeatIdx + 1;
-	
-			console.log(' HEART BEAT <3 : ' + newHeartBeatIdx);
-	
-			let heartStr = newHeartBeatIdx % 2 === 0 ? 'on' : 'off';
-			setConsoleStr('heart beat <' + newHeartBeatIdx + '> - ' + heartStr);
-
-
-			if(clientStatus === CLIENT_NODE_STATE.INITIALIZING || clientStatus === CLIENT_NODE_STATE.DISCONNECTED)
-			{
-				
-				let callObj:ServerCallMessageObj = {callId:SocketController.get().callId, callType: SERVER_CALL_TYPE.CONNECT};
-
-				console.log(' call dat serverObj : ',serverObj);
-				console.log(' call dat shit : ',callObj);
-				
-				SocketController.get().sendMessage(serverObj, callObj, (response:ServerResponseMessageObj) => {
-	
-					console.log('...... RECEIVED ---- ('+serverObj.alias+') response : ',response);
-					// setServerActionsReceived("received <"+response.callId+"> : "+response.responseType+" -- "+response.message+" ");
-					
-				});
-			}
-
-			return newHeartBeatIdx; // return the updated index for the next state
-		});
-	}
-
-	return (
+	return ( 
 		<div className="clientContainer">
 			<div className="clientHeader">
 				<div className="clientTitle"> {clientId} </div>
@@ -160,7 +250,9 @@ function ClientComponent() {
 			<div className="clientStatus">
 				<div className={`clientStatusContainer ${clientStatus}`}>
 					<div className="clientStatusTitle">{clientStatusTitle}</div>
-					<div className="clientStatusContent">{clientStatusContent}</div>
+					<div className={`clientStatusContent ${clientActionState}`}>
+						{clientStatusContent}
+					</div>
 				</div>
 			</div>
 			<div className="clientTools">

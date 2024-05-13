@@ -11,12 +11,8 @@ function DashboardComponent() {
 		// backgroundColor: 'rgba(255, 0, 0, 0.5)',
 	}
 
-	useEffect(() => { 
-
-		
-
-	
-	}, []);
+	// useEffect(() => { 
+	// }, []);
 
 	return (
 		<div className="serverGridContainer">

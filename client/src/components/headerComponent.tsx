@@ -22,6 +22,11 @@ export function HeaderComponent()
 		window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.ALL_PING,{}));
 	}
 
+	const onResetAll = () => {
+		console.log(' onResetAll() ');
+		window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.ALL_RESET,{}));
+	}
+
 	return (
 		<div className='headerContainer'>
 			<div className='headerLogoContainer'><Link to="/"><div className='headerLogo'></div></Link></div>
@@ -37,6 +42,10 @@ export function HeaderComponent()
 			<div>&nbsp;</div>
 			<div>
 				<Button onClick={onPingAll}>Ping All</Button>
+			</div>
+			<div>&nbsp;</div>
+			<div>
+				<Button onClick={onResetAll}>RESET All</Button>
 			</div>
 			{/* <div className='headerButton'><Link to="/categories"><div className="headerButtonContent">Categeories</div></Link></div>
 			<div className='headerButton'><Link to="/groups"><div className="headerButtonContent">Groups</div></Link></div>
