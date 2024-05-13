@@ -141,11 +141,6 @@ wss.on('connection', (ws) => {
 
 				for(let streamX:number=0; streamX<serverCallObj.data.numPackets; streamX++)
 				{
-					Log.info('________');
-					Log.info('________');
-					Log.info('________');
-					Log.info('________ STREAM PACKET ::::: streamX='+streamX);
-
 					serverCallObj.data.deltaCallType = serverCallObj.callType;
 					serverCallObj.callType = SERVER_CALL_TYPE.PING;
 					
@@ -172,11 +167,6 @@ wss.on('connection', (ws) => {
 						}
 					};
 					await SocketClient.get().CallAnotherServer(serverCallObjReceived2);
-					Log.info('________');
-					Log.info('________');
-					Log.info('________END STREAM PACKET ::::: streamX='+streamX);
-					Log.info('________');
-					Log.info('________');
 				}
 
 				// await MiscUtils.GhettoWait(1000);
@@ -209,9 +199,9 @@ wss.on('connection', (ws) => {
 		}
 
 		let delay:number = 0;
-		if(latency != undefined)
+		if(latency != undefined && serverCallObj.callType == SERVER_CALL_TYPE.PING)
 		{
-			delay = parseInt(latency);
+			delay = parseInt(latency)/2;
 		}
 
 		// Log.info('('+server_alias+') _________________________ DELAY : '+delay);

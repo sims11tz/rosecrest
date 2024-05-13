@@ -170,6 +170,18 @@ function ClientComponent() {
 			case CLIENT_NODE_ACTION_STATE.RECEIVED:
 
 				console.log('CLIENT_NODE_ACTION_STATE.RECEIVED : ',ce.detail);
+
+				let myStreamResponses:ServerResponseMessageObj[] = [];
+				if(ce.detail.data.streamResponses != undefined)
+				{
+					ce.detail.data.streamResponses.forEach((obj:ServerResponseMessageObj) => {
+						if(obj.target === serverObjRef.current.alias) 
+						{
+							myStreamResponses.push(obj);
+						}
+					});
+				}
+
 				setClientStatusContent(
 					<div>
 						<h1>RECEIVED PING</h1>
@@ -182,13 +194,13 @@ function ClientComponent() {
 						(
 							<div>
 								<div>
-									<div>{ce.detail.data.streamResponses.length} out of {ce.detail.data.numPackets}</div>
+									<div>{myStreamResponses.length} out of {ce.detail.data.numPackets}</div>
 								</div>
 								<div>
 									<div>
-										{ce.detail.data.streamResponses.map((obj:ServerResponseMessageObj, index:number) => (
+										{myStreamResponses.map((obj:ServerResponseMessageObj, index:number) => (
 											<div key={"streamResults_"+index}>
-												<div>Received packet from {ce.detail.data.delta}</div>
+												<div>Received packet from {ce.detail.data.delta} took {MiscUtils.FormatMilliseconds(obj.callTime)}</div>
 											</div>
 										))}
 									</div>
