@@ -44,6 +44,7 @@
 		"start": "nodemon -L --exec 'PORT=6999 react-app-rewired start' --openssl-legacy-provider --ignore 'public/' -e ts,tsx,js,jsx,mjs,cjs,json,css",
 		"startWindows": "nodemon -L --exec \"cross-env BROWSER=none PORT=7000 react-app-rewired start\" --openssl-legacy-provider --ignore public/ -e ts,tsx,js,jsx,mjs,cjs,json,css",
 		"build": "react-scripts build",
+		"build2": "react-app-rewired build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject"
 	},

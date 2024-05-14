@@ -23,7 +23,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: '21'
 
     - name: Create symbolic link
       run: |
@@ -40,7 +40,7 @@ jobs:
       run: |
         cd client
         npm install
-        npm run build
+        npm run build2
 
     - name: Install server dependencies
       run: |
