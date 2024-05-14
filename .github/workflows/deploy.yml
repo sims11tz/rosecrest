@@ -33,24 +33,6 @@ jobs:
         cd client/src
         ln -s ../../shared ./
 
-    - name: DEBUG-List directory contents after symbolic link
-      run: |
-        node --version
-        npm -version
-        pwd
-
-    - name: Debug List directory contents after symbolic link
-      run: |
-        pwd
-        ls -lha client/src/
-        ls -lha client/src/shared
-
-    - name: Debug Print config-overrides.js
-      run: cat client/config-overrides.js
-
-    - name: Debug Print tsconfig.json
-      run: cat client/tsconfig.json
-
     - name: Install dependencies and build client
       run: |
         cd client
@@ -108,6 +90,7 @@ jobs:
         chmod 600 key.pem
         ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'
           cd /var/www/rosecrest
+          chown -R www-data:www-data .
           tar xzf deploy.tar.gz
           rm deploy.tar.gz
           sudo systemctl restart nginx
