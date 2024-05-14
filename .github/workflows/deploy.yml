@@ -10,17 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_ireland, server_aws_brazil]
+        server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_dublin, server_aws_brazil]
 
     env:
       EC2_USER: ${{ secrets.EC2_USER }}
       EC2_KEY: ${{ secrets.EC2_KEY }}
-      EC2_HOST_aws_california: ${{ secrets.EC2_HOST_AWS_CALIFORNIA }}
-      EC2_HOST_aws_ohio: ${{ secrets.EC2_HOST_BRAZIL }}
-      EC2_HOST_aws_paris: ${{ secrets.EC2_HOST_DUBLIN }}
-      EC2_HOST_aws_tokyo: ${{ secrets.EC2_HOST_OHIO }}
-      EC2_HOST_aws_dublin: ${{ secrets.EC2_HOST_DUBLIN }}
-      EC2_HOST_aws_brazil: ${{ secrets.EC2_HOST_BRAZIL }}
 
     steps:
     - name: Checkout code
@@ -42,9 +36,29 @@ jobs:
         cd server
         npm install
 
-    - name: Set EC2_HOST environment variable
-      id: set_host
-      run: echo "EC2_HOST=${{ secrets['EC2_HOST_' + matrix.server] }}" >> $GITHUB_ENV
+    - name: Set EC2_HOST for aws_california
+      if: matrix.server == 'aws_calofornia'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_AWS_CALIFORNIA }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for aws_ohio
+      if: matrix.server == 'aws_ohio'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_OHIO }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for aws_paris
+      if: matrix.server == 'aws_paris'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_PARIS }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for aws_tokyo
+      if: matrix.server == 'aws_tokyo'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_TOKYO }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for aws_dublin
+      if: matrix.server == 'aws_dublin'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_DUBLIN }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for aws_brazil
+      if: matrix.server == 'aws_brazil'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_BRAZIL }}" >> $GITHUB_ENV
 
     - name: Deploy to EC2
       run: |
