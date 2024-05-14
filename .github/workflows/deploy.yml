@@ -25,6 +25,9 @@ jobs:
       with:
         node-version: '14'
 
+    - name: Create symbolic link
+      run: ln -s /var/www/rosecrest/shared /var/www/rosecrest/client/src/shared
+
     - name: Install dependencies and build client
       run: |
         cd client
