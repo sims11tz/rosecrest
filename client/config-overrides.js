@@ -3,7 +3,7 @@ const { override, addWebpackAlias } = require('customize-cra');
 
 module.exports = override(
   addWebpackAlias({
-    '@shared': path.resolve(__dirname, 'shared'),
+    '@shared': path.resolve(__dirname, 'src/shared'),
   })
 );
 /*
