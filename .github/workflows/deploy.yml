@@ -11,7 +11,10 @@ jobs:
     strategy:
       matrix:
         server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_ireland, server_aws_brazil]
+
     env:
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_KEY: ${{ secrets.EC2_KEY }}
       EC2_HOST_aws_california: ${{ secrets.EC2_HOST_AWS_CALIFORNIA }}
       EC2_HOST_aws_ohio: ${{ secrets.EC2_HOST_BRAZIL }}
       EC2_HOST_aws_paris: ${{ secrets.EC2_HOST_DUBLIN }}
@@ -40,21 +43,16 @@ jobs:
         npm install
 
     - name: Deploy to EC2
-      uses: appleboy/scp-action@v0.1.3
-      with:
-        host: ${{ env['EC2_HOST_' + matrix.server] }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        source: "."
-        target: /var/www/rosecrest
+      env:
+        EC2_HOST: ${{ secrets['EC2_HOST_' + matrix.server] }}
+      run: |
+        scp -o StrictHostKeyChecking=no -i "$EC2_KEY" -r . "${EC2_USER}@${EC2_HOST}:/var/www/rosecrest"
 
     - name: SSH and restart server
-      uses: appleboy/ssh-action@v0.1.3
-      with:
-        host: ${{ env['EC2_HOST_' + matrix.server] }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        script: |
+      env:
+        EC2_HOST: ${{ secrets['EC2_HOST_' + matrix.server] }}
+      run: |
+        ssh -o StrictHostKeyChecking=no -i "$EC2_KEY" "${EC2_USER}@${EC2_HOST}" << 'EOF'
           cd /var/www/rosecrest
           sudo systemctl restart nginx
           pm2 restart server
