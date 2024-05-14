@@ -1,0 +1,53 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_ireland, server_aws_brazil]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies and build client
+      run: |
+        cd client
+        npm install
+        npm run build
+
+    - name: Install server dependencies
+      run: |
+        cd server
+        npm install
+
+    - name: Deploy to EC2
+      uses: appleboy/scp-action@v0.1.3
+      with:
+        host: ${{ secrets['EC2_HOST_' + matrix.server] }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        source: "."
+        target: /var/www/rosecrest
+
+    - name: SSH and restart server
+      uses: appleboy/ssh-action@v0.1.3
+      with:
+        host: ${{ secrets['EC2_HOST_' + matrix.server] }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          cd /var/www/rosecrest
+          sudo systemctl restart nginx
+          pm2 restart server
