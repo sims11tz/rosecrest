@@ -29,7 +29,7 @@ jobs:
       run: |
         ln -s shared /client/src/shared
 
-    - name: Debug: List directory contents after symbolic link
+    - name: List directory contents after symbolic link
       run: ls -lha client/src/
 
     - name: Install dependencies and build client
