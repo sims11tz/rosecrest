@@ -7,7 +7,7 @@ module.exports = {
 	alias: {
 	  'components': path.resolve(__dirname, 'src/components'),
 	  'react-dom/server': require.resolve('react-dom/server.browser.js'),
-	  '@shared': path.resolve(__dirname, '../shared'),
+	  '@shared': path.resolve(__dirname, 'src/shared'),
 	},
 	// Add additional plugins like TsconfigPathsPlugin if you are using TypeScript path aliases
 	plugins: [
