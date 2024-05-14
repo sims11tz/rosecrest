@@ -28,7 +28,7 @@ module.exports = override(
   (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@shared': path.resolve(__dirname, 'shared')
+      '@shared': path.resolve(__dirname, 'src/shared')
     };
     return config;
   },
