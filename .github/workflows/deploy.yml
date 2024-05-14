@@ -23,7 +23,7 @@ jobs:
         echo "$EC2_USER"
         echo "${{ env.EC2_USER }}"
         echo "$EC2_KEY"
-        echo "${{ env.EC2_KEY }}"
+        echo "${{ secrets.EC2_KEY }}"
 
     - name: Checkout code
       uses: actions/checkout@v2
