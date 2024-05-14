@@ -27,7 +27,7 @@ jobs:
 
     - name: Create symbolic link
       run: 
-        cd /var/www/rosecrest/client/src
+        cd client/src/
         ln -s ../../shared ./
 
     - name: Install dependencies and build client
