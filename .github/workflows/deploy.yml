@@ -22,6 +22,7 @@ jobs:
       run: |
         echo $:env:EC2_USER
         echo "$:env:EC2_USER"
+        echo "$EC2_USER"
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -99,7 +100,7 @@ jobs:
       run: |
         echo "${EC2_KEY}" > key.pem
         chmod 600 key.pem
-        scp -o StrictHostKeyChecking=no -i key.pem -r . "${{env.EC2_USER}}@${{env.EC2_HOST}}:/var/www/rosecrest"
+        scp -o StrictHostKeyChecking=no -i key.pem -r . "$EC2_USER@$EC2_HOST:/var/www/rosecrest"
 
     - name: SSH and restart server
       run: |
