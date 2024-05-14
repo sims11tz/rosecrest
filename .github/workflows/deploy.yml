@@ -33,9 +33,19 @@ jobs:
       run: |
         node --version
         npm -version
-        webpack -v
+        pwd
+
+    - name: Debug List directory contents after symbolic link
+      run: |
         pwd
         ls -lha client/src/
+        ls -lha client/src/shared
+
+    - name: Debug Print config-overrides.js
+      run: cat client/config-overrides.js
+
+    - name: Debug Print tsconfig.json
+      run: cat client/tsconfig.json
 
     - name: Install dependencies and build client
       run: |
