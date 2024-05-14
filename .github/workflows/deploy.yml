@@ -12,6 +12,8 @@ jobs:
       matrix:
         server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_dublin, aws_brazil]
 
+    environment: rose_crest 
+
     env:
       EC2_USER: ${{ secrets.EC2_USER }}
       EC2_KEY: ${{ secrets.EC2_KEY }}
