@@ -85,11 +85,15 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        scp -o StrictHostKeyChecking=no -i "$EC2_KEY" -r . "${EC2_USER}@${{ env.EC2_HOST }}:/var/www/rosecrest"
+        echo "${EC2_KEY}" > key.pem
+        chmod 600 key.pem
+        scp -o StrictHostKeyChecking=no -i key.pem -r . "${EC2_USER}@${{ env.EC2_HOST }}:/var/www/rosecrest"
 
     - name: SSH and restart server
       run: |
-        ssh -o StrictHostKeyChecking=no -i "$EC2_KEY" "${EC2_USER}@${{ env.EC2_HOST }}" << 'EOF'
+        echo "${EC2_KEY}" > key.pem
+        chmod 600 key.pem
+        ssh -o StrictHostKeyChecking=no -i key.pem "${EC2_USER}@${{ env.EC2_HOST }}" << 'EOF'
           cd /var/www/rosecrest
           sudo systemctl restart nginx
           pm2 restart server
