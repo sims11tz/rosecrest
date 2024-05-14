@@ -41,8 +41,7 @@ jobs:
       run: |
         cd client
         npm install
-        npm audit fix
-        npm run build
+        npm run build2
 
     - name: Install server dependencies
       run: |
