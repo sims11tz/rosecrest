@@ -13,17 +13,24 @@ jobs:
         server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_dublin, aws_brazil]
 
     env:
-      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_USER: ${{ env.EC2_USER }}
       EC2_KEY: ${{ secrets.EC2_KEY }}
 
     steps:
+
+    - name: Print all environment variables
+      run: env
 
     - name: Debug Print Environment Variables
       run: |
         echo "$EC2_USER"
         echo "${{ env.EC2_USER }}"
         echo "$EC2_KEY"
-        echo "${{ secrets.EC2_KEY }}"
+        echo "${{ secrets.EC2_USER }}"
+        "${{ secrets.EC2_USER }}"
+        ${{ secrets.EC2_USER }}
+        "${{ env.EC2_USER }}"
+        ${{ env.EC2_USER }}
 
     - name: Checkout code
       uses: actions/checkout@v2
