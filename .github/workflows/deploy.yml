@@ -27,7 +27,7 @@ jobs:
 
     - name: Create symbolic link
       run: |
-        ln -s shared /client/src/shared
+        ln -s shared /client/src/
 
     - name: List directory contents after symbolic link
       run: ls -lha client/src/
