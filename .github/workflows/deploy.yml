@@ -86,11 +86,20 @@ jobs:
       if: matrix.server == 'aws_brazil'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_BRAZIL }}" >> $GITHUB_ENV
 
+    - name: Create snapshot of the current directory
+      run: |
+        mkdir temp_snapshot
+        cp -a ./* temp_snapshot/
+
+    - name: Create tar.gz archive from snapshot
+      run: |
+        tar czf deploy.tar.gz -C temp_snapshot/ .
+        rm -rf temp_snapshot
+
     - name: Deploy to EC2
       run: |
         echo "${{ env.EC2_KEY }}" > key.pem
         chmod 600 key.pem
-        tar czf deploy.tar.gz .
         scp -o StrictHostKeyChecking=no -i key.pem deploy.tar.gz "${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/var/www/rosecrest"
 
     - name: SSH and restart server
