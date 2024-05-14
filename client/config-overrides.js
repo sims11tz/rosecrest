@@ -1,4 +1,13 @@
 const path = require('path');
+const { override, addWebpackAlias } = require('customize-cra');
+
+module.exports = override(
+  addWebpackAlias({
+    '@shared': path.resolve(__dirname, 'shared'),
+  })
+);
+/*
+const path = require('path');
 const { override, addBabelPreset, addWebpackModuleRule, useBabelRc } = require('customize-cra');
 
 module.exports = override(
@@ -37,3 +46,4 @@ module.exports = override(
   // Uncomment the line below if you have a custom Babel config you want to use
   // useBabelRc()
 );
+*/
