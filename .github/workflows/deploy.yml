@@ -27,7 +27,8 @@ jobs:
 
     - name: Create symbolic link
       run: |
-        ln -s shared client/src/shared
+        cd client/src
+        ln -s ../../shared ./
 
     - name: DEBUG-List directory contents after symbolic link
       run: |
