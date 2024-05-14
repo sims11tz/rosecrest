@@ -86,24 +86,20 @@ jobs:
       if: matrix.server == 'aws_brazil'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_BRAZIL }}" >> $GITHUB_ENV
 
-    - name: Debug Print Environment Variables
-      run: |
-        echo "$EC2_USER"
-        echo "$EC2_HOST"
-        echo "${{ env.EC2_USER }}"
-        echo "${{ env.EC2_HOST }}"
-
     - name: Deploy to EC2
       run: |
-        echo "${EC2_KEY}" > key.pem
+        echo "${{ env.EC2_KEY }}" > key.pem
         chmod 600 key.pem
-        scp -o StrictHostKeyChecking=no -i key.pem -r . "${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/var/www/rosecrest"
+        tar czf deploy.tar.gz .
+        scp -o StrictHostKeyChecking=no -i key.pem deploy.tar.gz "${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/var/www/rosecrest"
 
     - name: SSH and restart server
       run: |
-        echo "${EC2_KEY}" > key.pem
+        echo "${{ env.EC2_KEY }}" > key.pem
         chmod 600 key.pem
-        ssh -o StrictHostKeyChecking=no -i key.pem "${{env.EC2_USER}}@${{env.EC2_HOST}}" << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'
           cd /var/www/rosecrest
+          tar xzf deploy.tar.gz
+          rm deploy.tar.gz
           sudo systemctl restart nginx
           pm2 restart server
