@@ -41,7 +41,7 @@ jobs:
       run: |
         cd client
         npm install
-        npm audit fix --force
+        npm audit fix
         npm run build
 
     - name: Install server dependencies
