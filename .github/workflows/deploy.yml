@@ -20,8 +20,7 @@ jobs:
 
     - name: Debug Print Environment Variables
       run: |
-        echo "EC2_USER=${{ env.EC2_USER }}"
-        echo "EC2_KEY=${{ env.EC2_KEY }}"
+        echo EC2_USER
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -91,10 +90,8 @@ jobs:
 
     - name: Debug Print Environment Variables
       run: |
-        echo "EC2_USER=${{ env.EC2_USER }}"
-        echo "EC2_KEY=${{ env.EC2_KEY }}"
-        echo "EC2_HOST=${{ env.EC2_HOST }}"
-
+        echo $ EC2_USER
+        echo $ EC2_HOST
 
     - name: Deploy to EC2
       run: |
