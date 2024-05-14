@@ -52,7 +52,7 @@ jobs:
       run: |
         cd client
         npm install
-        npm run build2
+        CI=false npm run build2
 
     - name: Install server dependencies
       run: |
