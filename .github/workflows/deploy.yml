@@ -23,7 +23,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '20'
+        node-version: '16'
 
     - name: Create symbolic link
       run: |
@@ -33,6 +33,7 @@ jobs:
       run: |
         node --version
         npm -version
+        webpack -v
         pwd
         ls -lha client/src/
 
