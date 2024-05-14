@@ -15,7 +15,7 @@ export default class AppController {
 	{
 		if (this._initCalled)
 		{
-			console.log("AppController.init() already called, skipping.");
+			console.log("AppController.init() alre ady called, skipping.");
 			return;
 		}
 		this._initCalled = true;
