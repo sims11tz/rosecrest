@@ -20,6 +20,6 @@ module.exports = override(
 
   // Setup an alias to simplify imports from the shared directory
   addWebpackAlias({
-    '@shared': path.resolve(__dirname, 'src/shared'),
+    '@shared': path.resolve(__dirname, '../shared'),
   })
 );
