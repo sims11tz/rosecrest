@@ -11,6 +11,13 @@ jobs:
     strategy:
       matrix:
         server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_ireland, server_aws_brazil]
+    env:
+      EC2_HOST_aws_california: ${{ secrets.EC2_HOST_AWS_CALIFORNIA }}
+      EC2_HOST_aws_ohio: ${{ secrets.EC2_HOST_BRAZIL }}
+      EC2_HOST_aws_paris: ${{ secrets.EC2_HOST_DUBLIN }}
+      EC2_HOST_aws_tokyo: ${{ secrets.EC2_HOST_OHIO }}
+      EC2_HOST_aws_dublin: ${{ secrets.EC2_HOST_DUBLIN }}
+      EC2_HOST_aws_brazil: ${{ secrets.EC2_HOST_BRAZIL }}
 
     steps:
     - name: Checkout code
@@ -35,7 +42,7 @@ jobs:
     - name: Deploy to EC2
       uses: appleboy/scp-action@v0.1.3
       with:
-        host: ${{ secrets['EC2_HOST_' + matrix.server] }}
+        host: ${{ env['EC2_HOST_' + matrix.server] }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         source: "."
@@ -44,7 +51,7 @@ jobs:
     - name: SSH and restart server
       uses: appleboy/ssh-action@v0.1.3
       with:
-        host: ${{ secrets['EC2_HOST_' + matrix.server] }}
+        host: ${{ env['EC2_HOST_' + matrix.server] }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         script: |
