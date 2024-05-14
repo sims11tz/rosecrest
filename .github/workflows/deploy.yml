@@ -89,7 +89,7 @@ jobs:
     - name: Create snapshot of the current directory
       run: |
         mkdir temp_snapshot
-        cp -a ./* temp_snapshot/
+        rsync -av --exclude='temp_snapshot' ./* temp_snapshot/
 
     - name: Create tar.gz archive from snapshot
       run: |
