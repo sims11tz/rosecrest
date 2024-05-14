@@ -20,7 +20,8 @@ jobs:
 
     - name: Debug Print Environment Variables
       run: |
-        echo EC2_USER
+        echo $:env:EC2_USER
+        echo "$:env:EC2_USER"
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -92,6 +93,7 @@ jobs:
       run: |
         echo $ EC2_USER
         echo $ EC2_HOST
+        echo $env:EC2_HOST
 
     - name: Deploy to EC2
       run: |
