@@ -31,6 +31,8 @@ jobs:
 
     - name: DEBUG-List directory contents after symbolic link
       run: |
+        node --version
+        npm -version
         pwd
         ls -lha client/src/
 
