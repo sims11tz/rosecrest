@@ -15,7 +15,7 @@ export default class AppController {
 	{
 		if (this._initCalled)
 		{
-			console.log("AppController. init( ) alr eady  called, skipping.");
+			console.log("AppController. init( ) al r eady  called, skipping.");
 			return;
 		}
 		this._initCalled = true;
@@ -30,8 +30,8 @@ export default class AppController {
 			
 			let serverObj: ServerObj = {
 				alias: server,
-				ip: process.env['REACT_APP_'+server+'_ip'] || '',
-				port_external: process.env['REACT_APP_'+server+'_port'] || ''
+				ip: process.env[server+'_ip'] || '',
+				port_external: process.env[server+'_port'] || ''
 			};
 
 			this._servers.push(serverObj);

@@ -10,6 +10,7 @@ import { createServer, Server as HttpServer } from 'http';
 import { Socket } from "dgram";
 import { SocketClient } from "./endpoints/socketClient";
 import AppController from "./endpoints/AppController";
+import * as dotenv from 'dotenv'
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // const port = process.env.REACT_APP_SERVER_PORT || 7000;
+
+dotenv.config();
 
 const server_alias = process.env.SERVER_ALIAS;
 const server_list = process.env.SERVER_LIST;
@@ -29,6 +32,7 @@ const port_external = process.env[server_alias+"_port"];
 const port_internal = process.env.REACT_APP_SERVER_PORT || 7000;
 
 // app.listen(port_internal, () => { console.log(`App server now listening on port ${port_internal}`); });
+
 
 Log.info("<"+server_alias+">____SERVER_ALIAS_____ ");
 Log.info("<"+server_alias+"> ip : "+ip);

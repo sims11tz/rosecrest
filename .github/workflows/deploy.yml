@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        server: [aws_california, aws_ohio, aws_paris, aws_tokyo, aws_dublin, aws_brazil]
+        server: [server_aws_california, server_aws_ohio, server_aws_paris, server_aws_tokyo, server_aws_dublin, server_aws_brazil]
 
     environment: rose_crest 
 
@@ -44,28 +44,28 @@ jobs:
         cd server
         npm install
 
-    - name: Set EC2_HOST for aws_california
-      if: matrix.server == 'aws_california'
+    - name: Set EC2_HOST for server_aws_california
+      if: matrix.server == 'server_aws_california'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_AWS_CALIFORNIA }}" >> $GITHUB_ENV
 
-    - name: Set EC2_HOST for aws_ohio
-      if: matrix.server == 'aws_ohio'
+    - name: Set EC2_HOST for server_aws_ohio
+      if: matrix.server == 'server_aws_ohio'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_OHIO }}" >> $GITHUB_ENV
 
-    - name: Set EC2_HOST for aws_paris
-      if: matrix.server == 'aws_paris'
+    - name: Set EC2_HOST for server_aws_paris
+      if: matrix.server == 'server_aws_paris'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_PARIS }}" >> $GITHUB_ENV
 
-    - name: Set EC2_HOST for aws_tokyo
-      if: matrix.server == 'aws_tokyo'
+    - name: Set EC2_HOST for server_aws_tokyo
+      if: matrix.server == 'server_aws_tokyo'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_TOKYO }}" >> $GITHUB_ENV
 
-    - name: Set EC2_HOST for aws_dublin
-      if: matrix.server == 'aws_dublin'
+    - name: Set EC2_HOST for server_aws_dublin
+      if: matrix.server == 'server_aws_dublin'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_DUBLIN }}" >> $GITHUB_ENV
 
-    - name: Set EC2_HOST for aws_brazil
-      if: matrix.server == 'aws_brazil'
+    - name: Set EC2_HOST for server_aws_brazil
+      if: matrix.server == 'server_aws_brazil'
       run: echo "EC2_HOST=${{ secrets.EC2_HOST_BRAZIL }}" >> $GITHUB_ENV
 
     - name: Create snapshot of the current directory
@@ -111,7 +111,9 @@ jobs:
            cd /var/www/rosecrest/server
            rm .env
            mv prod.env .env
-           
+           cat >> .env <<EOL
+           SERVER_ALIAS=${{ matrix.server }}
+           EOL
 
     - name: SSH and restart server
       run: |
