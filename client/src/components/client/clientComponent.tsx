@@ -40,6 +40,7 @@ function ClientComponent() {
 //Always tries to reach connected state and then just reflects the server state
 
 	const [clientId,setClientId] = useState<string>('');
+	const [clientLocation,setClientLocation] = useState<string>('');
 	useEffect(() => {
 		
 		console.log(' clientComponent clientId ---- ',clientId);
@@ -56,7 +57,7 @@ function ClientComponent() {
 		if(clientIdParam == null || clientIdParam == undefined || clientIdParam == '')
 		{
 			console.log('A:',process.env.REACT_APP_SERVER_ALIAS);
-			setClientId(process.env.nREACT_APP_SERVER_ALIAS || '');
+			setClientId(process.env.REACT_APP_SERVER_ALIAS || '');
 			_firstClientId = process.env.REACT_APP_SERVER_ALIAS || '';
 		}
 		else
@@ -65,6 +66,8 @@ function ClientComponent() {
 			setClientId(clientIdParam);
 			_firstClientId = clientIdParam;
 		}
+		
+		setClientLocation(process.env['REACT_APP_'+_firstClientId+'_location'] || '');
 
 		setClientStatus(CLIENT_NODE_STATE.INITIALIZING);
 		setClientStatusTitle('initializing...');
@@ -297,8 +300,8 @@ function ClientComponent() {
 	return ( 
 		<div className="clientContainer">
 			<div className="clientHeader">
-				<div className="clientTitle"> {clientId} </div>
-				<div className="clientDetails"> {serverObj.ip} </div>
+				<div className="clientTitle"> {clientLocation} </div>
+				<div className="clientDetails"> {clientId} {serverObj.ip} </div>
 			</div>
 			
 			<div className="clientStatus">
