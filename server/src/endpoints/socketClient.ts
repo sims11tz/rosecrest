@@ -60,6 +60,8 @@ export class SocketClient {
 			const wsc = new WebSocket(url);
 			let startTime: number=0;
 
+			Log.info('connectAndSendMessage serverCallObj:',serverCallObj);
+
 			wsc.on('open', () => {
 				try {
 					startTime = Date.now();

@@ -310,7 +310,7 @@ function ClientComponent() {
 					<div className={`clientStatusContent  ${clientActionState}`}>
 						{clientStatusContent}
 					</div>
-					<div className="clientStatusContentBG server_bg_image"></div>
+					<div className={`clientStatusContentBG server_bg_image ${clientActionState}`}></div>
 				</div>
 			</div>
 			<div className="clientTools">

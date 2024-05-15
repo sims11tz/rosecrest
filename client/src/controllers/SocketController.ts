@@ -37,9 +37,9 @@ export default class SocketController {
 			}
 
 			socket.onmessage = (event:MessageEvent) => {
-				// console.log('');
-				// console.log('____________________________________');
-				// console.log('onMessage < OMG OMG OMG OMG OMG > : ',event);
+				console.log('');
+				console.log('____________________________________');
+				console.log('onMessage < OMG OMG OMG OMG OMG > : ',event);
 				
 				let responseObj:ServerResponseMessageObj = JSON.parse(event.data);
 				if(responseObj.responseType === SERVER_RESPONSE_TYPE.WELCOME)

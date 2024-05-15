@@ -78,8 +78,45 @@
 	bottom: 0;
 	right: 0;
 	left: 0;
-	opacity: 0.15;
+	opacity: 0.25;
 	background-size:100% 100%;
+}
+
+.clientStatusContentBG.server_bg_image.NONE
+{
+	opacity: 0.85;
+}
+
+.clientStatusContentBG.NONE
+{
+
+}
+.clientStatusContentBG.COUNTDOWN
+{
+	
+}
+.server_aws_ohio .clientStatusContentBG.LISTENING,
+.server_aws_california .clientStatusContentBG.LISTENING,
+.server_aws_paris .clientStatusContentBG.LISTENING,
+.server_aws_dublin .clientStatusContentBG.LISTENING,
+.server_aws_tokyo .clientStatusContentBG.LISTENING,
+.server_aws_brazil .clientStatusContentBG.LISTENING
+{
+	opacity: 0.85;
+	background-image: url('/public/images/server_listening.png');
+}
+
+.clientStatusContentBG.SENDING
+{
+	
+}
+.clientStatusContentBG.RECEIVED
+{
+	
+}
+.clientStatusContentBG.RESULTS
+{
+	
 }
 
 .server_aws_california .clientStatusContentBG
@@ -185,7 +222,7 @@
 
 .clientStatusContent.LISTENING
 {
-	background-color: lightsalmon;
+	background-color: lightgoldenrodyellow;
 }
 
 .clientStatusContent.SENDING
