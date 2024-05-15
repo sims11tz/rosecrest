@@ -55,9 +55,9 @@ function ClientComponent() {
 		// const clientId = clientIdParam ? clientIdParam : 'unknown';
 		if(clientIdParam == null || clientIdParam == undefined || clientIdParam == '')
 		{
-			console.log('A:',process.env.nREACT_APP_SERVER_ALIAS);
+			console.log('A:',process.env.REACT_APP_SERVER_ALIAS);
 			setClientId(process.env.nREACT_APP_SERVER_ALIAS || '');
-			_firstClientId = process.env.nREACT_APP_SERVER_ALIAS || '';
+			_firstClientId = process.env.REACT_APP_SERVER_ALIAS || '';
 		}
 		else
 		{
