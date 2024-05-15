@@ -89,9 +89,12 @@ jobs:
         echo "${{ env.EC2_KEY }}" > key.pem
         chmod 600 key.pem
         ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'
+          sudo rm -rf /var/www/rosecrest/*
           cd /var/www/rosecrest
-          sudo chown -R www-data:www-data /var/www/rosecrest
           tar xzf deploy.tar.gz
           rm deploy.tar.gz
+
+    - name: SSH and restart server
+      run: |
           sudo systemctl restart nginx
           pm2 restart server
