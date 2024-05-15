@@ -102,5 +102,7 @@ jobs:
 
     - name: SSH and restart server
       run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'
+          cd /var/www/rosecrest
           sudo systemctl restart nginx
           pm2 restart server
