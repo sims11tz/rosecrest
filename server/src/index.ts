@@ -11,6 +11,7 @@ import { Socket } from "dgram";
 import { SocketClient } from "./endpoints/socketClient";
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,7 +32,7 @@ const port_internal = process.env.REACT_APP_SERVER_PORT || 7000;
 Log.info("<"+server_alias+">____SERVER_ALIAS_____ ");
 Log.info("<"+server_alias+"> ip : "+ip);
 Log.info("<"+server_alias+"> port_external : "+port_external); 
-Log.info("<"+server_alias+"> port_internal : "+port_internal);
+Log.info("<"+server_alias+"> port_in ternal : "+port_internal);
 Log.info("<"+server_alias+"> server_list : "+server_list);
 Log.info("<"+server_alias+"> location : "+location); 
 Log.info("<"+server_alias+"> latency : "+latency);
@@ -40,9 +41,8 @@ Log.info("<"+server_alias+"> latency : "+latency);
 const httpServer = createServer(app);
 
 
-
-// Initialize the WebSocket on the HttpServer
-const wss = new WebSocketServer({ server: httpServer });
+// WebSocket server
+const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 SocketClient.get().setWss(wss);
 
 wss.on('connection', (ws) => {
@@ -298,5 +298,5 @@ app.post("/api/:ep", async (req: Request, res: Response) => {
 
 
 httpServer.listen(port_internal, () => {
-	console.log(`Server now listening on http://127.0.0.1:${port_internal}`);
+	console.log(`Server now listening on ${ip}:${port_internal}`);
 });
