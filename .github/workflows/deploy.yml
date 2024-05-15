@@ -37,6 +37,8 @@ jobs:
       run: |
         cd client
         npm install
+        rm .env
+        cp prod.env .env
         CI=false npm run build2
 
     - name: Install server dependencies
