@@ -111,9 +111,7 @@ jobs:
            cd /var/www/rosecrest/server
            rm .env
            mv prod.env .env
-           cat >> .env <<EOL
-           SERVER_ALIAS=${{ matrix.server }}
-           EOL
+           printf "\nSERVER_ALIAS=${{ matrix.server.alias }}\n" >> .env
 
     - name: SSH and restart server
       run: |

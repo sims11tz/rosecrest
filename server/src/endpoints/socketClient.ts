@@ -17,8 +17,13 @@ export class SocketClient {
 	public CallAnotherServer(serverCallObj: ServerCallMessageObj): Promise<ServerResponseMessageObj[]>
 	{
 		return new Promise(async (resolve, reject) => {
+
+			Log.info('CallAnotherServer : ',serverCallObj);
+
 			let sendPacketObj: SendPacketObj = serverCallObj.data as SendPacketObj;
 			let targets = sendPacketObj.target.split(',');
+
+			Log.info('targets : ',targets);
 
 			// Map each target to a WebSocket connection promise
 			const promises = targets.map(target => this.connectAndSendMessage(target, serverCallObj));
@@ -35,10 +40,13 @@ export class SocketClient {
 	private async connectAndSendMessage(target: string, serverCallObj: ServerCallMessageObj): Promise<ServerResponseMessageObj>
 	{
 		return new Promise((resolve, reject) => {
+
+			Log.info('connectAndSendMessage');
+
 			const target_ip = process.env[`${target}_ip`];
 			const target_port_external = process.env.socket_port;
 
-			const url = `ws://${target_ip}:${target_port_external}`;
+			const url = `ws://${target_ip}:${target_port_external}/ws`;
 			const wsc = new WebSocket(url);
 			let startTime: number=0;
 
