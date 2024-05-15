@@ -105,4 +105,5 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'
           cd /var/www/rosecrest
           sudo systemctl restart nginx
-          pm2 restart server
+          pm2 delete server || true
+          pm2 start /var/www/rosecrest/server/src/index.ts --interpreter /usr/local/bin/ts-node --name server
