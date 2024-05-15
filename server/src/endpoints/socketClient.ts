@@ -36,7 +36,7 @@ export class SocketClient {
 	{
 		return new Promise((resolve, reject) => {
 			const target_ip = process.env[`${target}_ip`];
-			const target_port_external = '7002'; // process.env[`${target}_port`]; If you need to fetch from env, uncomment this line.
+			const target_port_external = process.env.socket_port;
 
 			const url = `ws://${target_ip}:${target_port_external}`;
 			const wsc = new WebSocket(url);

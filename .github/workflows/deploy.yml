@@ -108,6 +108,10 @@ jobs:
            cd /var/www/rosecrest/client
            rm .env
            mv prod.env .env
+           cd /var/www/rosecrest/server
+           rm .env
+           mv prod.env .env
+           
 
     - name: SSH and restart server
       run: |

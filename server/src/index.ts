@@ -9,6 +9,7 @@ import { Server as WebSocketServer, WebSocket } from 'ws';
 import { createServer, Server as HttpServer } from 'http';
 import { Socket } from "dgram";
 import { SocketClient } from "./endpoints/socketClient";
+import AppController from "./endpoints/AppController";
 
 const app = express();
 
@@ -40,6 +41,7 @@ Log.info("<"+server_alias+"> latency : "+latency);
 // Create a single HttpServer from the express app
 const httpServer = createServer(app);
 
+AppController.get().init(() => { console.log('App controller initialized'); });
 
 // WebSocket server
 const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
