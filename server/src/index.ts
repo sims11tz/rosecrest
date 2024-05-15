@@ -97,7 +97,7 @@ wss.on('connection', (ws) => {
 				await SocketClient.get().AllTargetClientsListenMode(serverCallObj);
 				
 				//Show CountDown on my clients
-				await SocketClient.get().AllMyClientsShowCountDown(3);
+				await SocketClient.get().AllMyClientsShowCountDown(5);
 
 				//Tell targets to send the packet
 				serverCallObj.data.deltaCallType = serverCallObj.callType;
@@ -137,7 +137,7 @@ wss.on('connection', (ws) => {
 				await SocketClient.get().AllTargetClientsListenMode(serverCallObj);
 				
 				//Show CountDown on my clients
-				await SocketClient.get().AllMyClientsShowCountDown(3);
+				await SocketClient.get().AllMyClientsShowCountDown(5);
 
 			//LOOP
 				let streamResponses:ServerResponseMessageObj[] = [];

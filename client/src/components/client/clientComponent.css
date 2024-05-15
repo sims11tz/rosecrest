@@ -102,9 +102,85 @@
 .server_aws_tokyo .clientStatusContentBG.LISTENING,
 .server_aws_brazil .clientStatusContentBG.LISTENING
 {
-	opacity: 0.85;
+	opacity: 0.65;
 	background-image: url('/public/images/server_listening.png');
 }
+
+
+.server_aws_ohio .clientStatusContentBG.COUNTDOWN.ONE,
+.server_aws_california .clientStatusContentBG.COUNTDOWN.ONE,
+.server_aws_paris .clientStatusContentBG.COUNTDOWN.ONE,
+.server_aws_dublin .clientStatusContentBG.COUNTDOWN.ONE,
+.server_aws_tokyo .clientStatusContentBG.COUNTDOWN.ONE,
+.server_aws_brazil .clientStatusContentBG.COUNTDOWN.ONE
+{
+	opacity: 0.85;
+	background-image: url('/public/images/countdown_1.png');
+}
+
+.server_aws_ohio .clientStatusContentBG.COUNTDOWN.TWO,
+.server_aws_california .clientStatusContentBG.COUNTDOWN.TWO,
+.server_aws_paris .clientStatusContentBG.COUNTDOWN.TWO,
+.server_aws_dublin .clientStatusContentBG.COUNTDOWN.TWO,
+.server_aws_tokyo .clientStatusContentBG.COUNTDOWN.TWO,
+.server_aws_brazil .clientStatusContentBG.COUNTDOWN.TWO
+{
+	opacity: 0.85;
+	background-image: url('/public/images/countdown_2.png');
+}
+
+.server_aws_ohio .clientStatusContentBG.COUNTDOWN.THREE,
+.server_aws_california .clientStatusContentBG.COUNTDOWN.THREE,
+.server_aws_paris .clientStatusContentBG.COUNTDOWN.THREE,
+.server_aws_dublin .clientStatusContentBG.COUNTDOWN.THREE,
+.server_aws_tokyo .clientStatusContentBG.COUNTDOWN.THREE,
+.server_aws_brazil .clientStatusContentBG.COUNTDOWN.THREE
+{
+	opacity: 0.85;
+	background-image: url('/public/images/countdown_3.png');
+}
+
+.server_aws_ohio .clientStatusContentBG.COUNTDOWN.FOUR,
+.server_aws_california .clientStatusContentBG.COUNTDOWN.FOUR,
+.server_aws_paris .clientStatusContentBG.COUNTDOWN.FOUR,
+.server_aws_dublin .clientStatusContentBG.COUNTDOWN.FOUR,
+.server_aws_tokyo .clientStatusContentBG.COUNTDOWN.FOUR,
+.server_aws_brazil .clientStatusContentBG.COUNTDOWN.FOUR
+{
+	opacity: 0.85;
+	background-image: url('/public/images/countdown_4.png');
+}
+
+.server_aws_ohio .clientStatusContentBG.COUNTDOWN.FIVE,
+.server_aws_california .clientStatusContentBG.COUNTDOWN.FIVE,
+.server_aws_paris .clientStatusContentBG.COUNTDOWN.FIVE,
+.server_aws_dublin .clientStatusContentBG.COUNTDOWN.FIVE,
+.server_aws_tokyo .clientStatusContentBG.COUNTDOWN.FIVE,
+.server_aws_brazil .clientStatusContentBG.COUNTDOWN.FIVE
+{
+	opacity: 0.85;
+	background-image: url('/public/images/countdown_5.png');
+}
+
+.resultsTotals
+{
+	font-size: 60px;
+	font-weight: bold;
+}
+
+.resultsPacket
+{
+	font-size: 40px;
+	font-weight: bold;
+}
+
+.resultsTitle
+{
+	font-size: 80px;
+	font-weight: bold;
+
+}
+
 
 .clientStatusContentBG.SENDING
 {
@@ -114,9 +190,27 @@
 {
 	
 }
-.clientStatusContentBG.RESULTS
+
+.server_aws_ohio .clientStatusContentBG.RECEIVED,
+.server_aws_california .clientStatusContentBG.RECEIVED,
+.server_aws_paris .clientStatusContentBG.RECEIVED,
+.server_aws_dublin .clientStatusContentBG.RECEIVED,
+.server_aws_tokyo .clientStatusContentBG.RECEIVED,
+.server_aws_brazil .clientStatusContentBG.RECEIVED
 {
-	
+	opacity: 0.65;
+	background-image: url('/public/images/server_received.png');
+}
+
+.server_aws_ohio .clientStatusContentBG.RESULTS,
+.server_aws_california .clientStatusContentBG.RESULTS,
+.server_aws_paris .clientStatusContentBG.RESULTS,
+.server_aws_dublin .clientStatusContentBG.RESULTS,
+.server_aws_tokyo .clientStatusContentBG.RESULTS,
+.server_aws_brazil .clientStatusContentBG.RESULTS
+{
+	opacity: 0.65;
+	background-image: url('/public/images/server_results.png');
 }
 
 .server_aws_california .clientStatusContentBG

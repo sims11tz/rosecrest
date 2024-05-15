@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Button } from "@mui/material";
+import { breadcrumbsClasses, Button } from "@mui/material";
 import { CUSTOM_EVENTS } from "dataTypes/ClientDataTypes";
 import SocketController from "controllers/SocketController";
 import { CLIENT_NODE_ACTION_STATE, CLIENT_NODE_STATE, SERVER_CALL_TYPE, ServerCallMessageObj, ServerObj, ServerResponseMessageObj } from "@shared/DataTypes";
@@ -32,7 +32,8 @@ function ClientComponent() {
 	const [clientStatusContent,setClientStatusContent] = useState<ReactNode>(<div></div>);
 	const [clientStatusTitle,setClientStatusTitle] = useState<string>('');
 	
-	
+	const [countDownNumber,setCountDownNumber] = useState<string>('FIVE');
+
 	let style:React.CSSProperties = {
 		// backgroundColor: 'rgba(255, 0, 0, 0.5)',
 	}
@@ -176,11 +177,11 @@ function ClientComponent() {
 				<div>
 					<h1>Listening.....</h1>
 					{ce.detail.data.deltaCallType === SERVER_CALL_TYPE.SEND_PACKET ? (
-						<div>For one 1 packet from {ce.detail.delta}</div>
+						<div className="resultsTitle">For one 1 packet from {ce.detail.delta}</div>
 					)
 					:
 					(
-						<div>For packet stream from {ce.detail.delta}</div>
+						<div className="resultsTitle">For packet stream from {ce.detail.delta}</div>
 					)}
 				</div>);
 			break;
@@ -191,6 +192,16 @@ function ClientComponent() {
 						<h1>COUNT-DOWN</h1>
 						<div className="countDownNumber">{ce.detail.clientData.countdown}</div>
 					</div>);
+
+					console.log('ce.detail.clientData.countdown:',ce.detail.clientData.countdown);
+					switch(ce.detail.clientData.countdown.toString())
+					{
+						case "5": setCountDownNumber('FIVE'); break;
+						case "4": setCountDownNumber('FOUR'); break;
+						case "3": setCountDownNumber('THREE'); break;
+						case "2": setCountDownNumber('TWO'); break;
+						case "1": setCountDownNumber('ONE'); break;
+					}
 			break;
 
 			case CLIENT_NODE_ACTION_STATE.RECEIVED:
@@ -210,8 +221,8 @@ function ClientComponent() {
 
 				setClientStatusContent(
 					<div>
-						<h1>RECEIVED PING</h1>
-						<div>{ce.detail.message}</div>
+						<h1 className="resultsTitle">RECEIVED PING</h1>
+						<div className="resultsTotals">{ce.detail.message}</div>
 						<div>&nbsp;</div>
 						{ce.detail.data.deltaCallType === SERVER_CALL_TYPE.SEND_PACKET ? (
 							<div></div>
@@ -220,13 +231,13 @@ function ClientComponent() {
 						(
 							<div>
 								<div>
-									<div>{myStreamResponses.length} out of {ce.detail.data.numPackets}</div>
+									<div className="resultsPacket">{myStreamResponses.length} out of {ce.detail.data.numPackets}</div>
 								</div>
 								<div>
 									<div>
 										{myStreamResponses.map((obj:ServerResponseMessageObj, index:number) => (
 											<div key={"streamResults_"+index}>
-												<div>Received packet from {ce.detail.data.delta} took {MiscUtils.FormatMilliseconds(obj.callTime)}</div>
+												<div className="resultsTotals">Received packet from {ce.detail.data.delta} took {MiscUtils.FormatMilliseconds(obj.callTime)}</div>
 											</div>
 										))}
 									</div>
@@ -247,17 +258,17 @@ function ClientComponent() {
 
 				setClientStatusContent(
 					<div>
-						<h1>RESULTS</h1>
+						<h1 className="resultsTitle">RESULTS</h1>
 						<div className="countDownResults">
 							<div>
 								{ce.detail.clientData.countdownResults.map((obj:ServerResponseMessageObj, index:number) => (
 									<div key={"countDownResults_"+index}>
-										<div>{serverObj.alias} called {obj.target} and took {MiscUtils.FormatMilliseconds(obj.callTime)}</div>
+										<div className="resultsPacket">{serverObj.alias} called {obj.target} and took {MiscUtils.FormatMilliseconds(obj.callTime)}</div>
 									</div>
 								))}
 							</div>
 							<div>&nbsp;</div>
-							<div>
+							<div className="resultsTotals">
 								<div>Total Calls : {totalCalls}</div>
 								<div>Total Time : {MiscUtils.FormatMilliseconds(totalTime)}</div>
 							</div>
@@ -310,7 +321,7 @@ function ClientComponent() {
 					<div className={`clientStatusContent  ${clientActionState}`}>
 						{clientStatusContent}
 					</div>
-					<div className={`clientStatusContentBG server_bg_image ${clientActionState}`}></div>
+					<div className={`clientStatusContentBG server_bg_image ${clientActionState} ${countDownNumber}`}></div>
 				</div>
 			</div>
 			<div className="clientTools">
