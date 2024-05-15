@@ -107,5 +107,5 @@ jobs:
           sudo systemctl restart nginx
           pm2 delete server || true
           pm2 kill
-          cs /var/www/rosecrest/server
+          cd /var/www/rosecrest/server
           pm2 start ts-node -- --type-check -r tsconfig-paths/register src/index.ts
