@@ -1,1 +1,1 @@
-export const service_list = ["server_geurts_home","server_aws_california","server_aws_ohio","server_aws_paris","server_aws_tokyo","server_aws_dublin","server_aws_brazil"];
+export const service_list = ["server_aws_california","server_aws_ohio","server_aws_paris","server_aws_tokyo","server_aws_dublin","server_aws_brazil"];

@@ -100,6 +100,15 @@ jobs:
           tar xzf deploy.tar.gz
           rm deploy.tar.gz
 
+    - name: SSH and setup prod env
+      run: |
+         echo "${{ env.EC2_KEY }}" > key.pem
+         chmod 600 key.pem
+         ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'
+           cd /var/www/rosecrest/client
+           rm .env
+           mv prod.env .env
+
     - name: SSH and restart server
       run: |
         ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'

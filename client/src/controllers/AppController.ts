@@ -29,8 +29,7 @@ export default class AppController {
 			
 			let serverObj: ServerObj = {
 				alias: server,
-				// ip: process.env['REACT_APP_'+server+'_ip'] || '',
-				ip: '127.0.0.1',
+				ip: process.env['REACT_APP_'+server+'_ip'] || '',
 				port_external: process.env['REACT_APP_'+server+'_port'] || ''
 			};
 

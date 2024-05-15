@@ -23,7 +23,7 @@ export default class SocketController {
 			// console.log('_______________SS not connected open please');
 			// console.log(`ws://${serverObj.ip}:${serverObj.port_external}`);
 
-			socket = new WebSocket(`ws://${serverObj.ip}:${serverObj.port_external}`);
+			socket = new WebSocket(`ws://${serverObj.ip}:${serverObj.port_external}/ws`);
 			socket.onopen = () => {
 				window.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.SOCKET_SERVER_OPEN,{detail:serverObj}));
 			};
