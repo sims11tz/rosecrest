@@ -47,13 +47,15 @@ export class SocketClient {
 			const target_domain = process.env[`${target}_domain`];
 			const target_ip = process.env[`${target}_ip`];
 			const target_port_external = process.env.socket_port;
+			const target_server_path = process.env.server_path;
 
 			Log.info('connectAndSendMessage target:',target);
 			Log.info('connectAndSendMessage target_ip:',target_ip);
 			Log.info('connectAndSendMessage target_domain:',target_domain);
 			Log.info('connectAndSendMessage target_port_external:',target_port_external);
+			Log.info('connectAndSendMessage target_server_path:',target_port_external);
 
-			const url = `ws://${target_domain}:${target_port_external}/ws/`;
+			const url = `ws://${target_domain}:${target_port_external}${target_server_path}`;
 			Log.info('url:',url);
 			const wsc = new WebSocket(url);
 			let startTime: number=0;

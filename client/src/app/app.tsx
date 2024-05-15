@@ -37,7 +37,7 @@ const AppContent = React.memo(() => {
 				<div id="routesContainer">
 					<Routes>
 						<Route path="/" element={<RosecrestComponent />} />
-						<Route path="/client" element={<ClientSelectorComponent />} />
+						<Route path="/client" element={<ClientComponent />} />
 						<Route path="/client/:clientIdParam" element={<ClientComponent />} />
 						<Route path="/dashboard" element={<DashboardComponent />} />
 					</Routes>
