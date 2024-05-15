@@ -20,6 +20,30 @@ jobs:
 
     steps:
 
+    - name: Set EC2_HOST for server_aws_california
+      if: matrix.server == 'server_aws_california'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_AWS_CALIFORNIA }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for server_aws_ohio
+      if: matrix.server == 'server_aws_ohio'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_OHIO }}" >> $GITHUB_ENV
+  
+    - name: Set EC2_HOST for server_aws_paris
+      if: matrix.server == 'server_aws_paris'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_PARIS }}" >> $GITHUB_ENV
+  
+    - name: Set EC2_HOST for server_aws_tokyo
+      if: matrix.server == 'server_aws_tokyo'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_TOKYO }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for server_aws_dublin
+      if: matrix.server == 'server_aws_dublin'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_DUBLIN }}" >> $GITHUB_ENV
+
+    - name: Set EC2_HOST for server_aws_brazil
+      if: matrix.server == 'server_aws_brazil'
+      run: echo "EC2_HOST=${{ secrets.EC2_HOST_BRAZIL }}" >> $GITHUB_ENV
+
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -39,36 +63,13 @@ jobs:
         npm install
         rm .env
         cp prod.env .env
+        printf "\nREACT_APP_SERVER_ALIAS=${{ matrix.server }}\n" >> .env
         CI=false npm run build2
 
     - name: Install server dependencies
       run: |
         cd server
         npm install
-
-    - name: Set EC2_HOST for server_aws_california
-      if: matrix.server == 'server_aws_california'
-      run: echo "EC2_HOST=${{ secrets.EC2_HOST_AWS_CALIFORNIA }}" >> $GITHUB_ENV
-
-    - name: Set EC2_HOST for server_aws_ohio
-      if: matrix.server == 'server_aws_ohio'
-      run: echo "EC2_HOST=${{ secrets.EC2_HOST_OHIO }}" >> $GITHUB_ENV
-
-    - name: Set EC2_HOST for server_aws_paris
-      if: matrix.server == 'server_aws_paris'
-      run: echo "EC2_HOST=${{ secrets.EC2_HOST_PARIS }}" >> $GITHUB_ENV
-
-    - name: Set EC2_HOST for server_aws_tokyo
-      if: matrix.server == 'server_aws_tokyo'
-      run: echo "EC2_HOST=${{ secrets.EC2_HOST_TOKYO }}" >> $GITHUB_ENV
-
-    - name: Set EC2_HOST for server_aws_dublin
-      if: matrix.server == 'server_aws_dublin'
-      run: echo "EC2_HOST=${{ secrets.EC2_HOST_DUBLIN }}" >> $GITHUB_ENV
-
-    - name: Set EC2_HOST for server_aws_brazil
-      if: matrix.server == 'server_aws_brazil'
-      run: echo "EC2_HOST=${{ secrets.EC2_HOST_BRAZIL }}" >> $GITHUB_ENV
 
     - name: Create snapshot of the current directory
       run: |
@@ -107,9 +108,6 @@ jobs:
          echo "${{ env.EC2_KEY }}" > key.pem
          chmod 600 key.pem
          ssh -o StrictHostKeyChecking=no -i key.pem "${{ env.EC2_USER }}@${{ env.EC2_HOST }}" << 'EOF'
-           cd /var/www/rosecrest/client
-           rm .env
-           mv prod.env .env
            cd /var/www/rosecrest/server
            rm .env
            mv prod.env .env

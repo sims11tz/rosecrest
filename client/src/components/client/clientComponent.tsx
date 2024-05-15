@@ -20,7 +20,7 @@ function ClientComponent() {
 
 	const [consoleStr,setConsoleStr] = useState<string>('');
 	
-	const { clientId } = useParams();
+	const { clientIdParam } = useParams();
 
 	const [clientStatus,setClientStatus] = useState<CLIENT_NODE_STATE>(CLIENT_NODE_STATE.UNKNOWN);
 	const clientStatusRef = useRef<CLIENT_NODE_STATE>(clientStatus);
@@ -39,16 +39,39 @@ function ClientComponent() {
 
 //Always tries to reach connected state and then just reflects the server state
 
+	const [clientId,setClientId] = useState<string>('');
+	useEffect(() => {
+		
+		console.log(' clientComponent clientId ---- ',clientId);
+
+	}, [clientId]);
+
 	useEffect(() => { 
 
 		console.log(' clientComponent init() ---- ');
+
+		console.log(' lets resolve the clientIdParam : ',clientIdParam);
+		let _firstClientId = '';
+		// const clientId = clientIdParam ? clientIdParam : 'unknown';
+		if(clientIdParam == null || clientIdParam == undefined || clientIdParam == '')
+		{
+			console.log('A:',process.env.nREACT_APP_SERVER_ALIAS);
+			setClientId(process.env.nREACT_APP_SERVER_ALIAS || '');
+			_firstClientId = process.env.nREACT_APP_SERVER_ALIAS || '';
+		}
+		else
+		{
+			console.log('B:',clientIdParam);
+			setClientId(clientIdParam);
+			_firstClientId = clientIdParam;
+		}
 
 		setClientStatus(CLIENT_NODE_STATE.INITIALIZING);
 		setClientStatusTitle('initializing...');
 
 		const intervalId = 0;
 
-		const foundServerObj = AppController.get().Servers.find(serverObj => serverObj.alias === clientId);
+		const foundServerObj = AppController.get().Servers.find(serverObj => serverObj.alias === _firstClientId);
 		if (foundServerObj) {
 			setServerObj(foundServerObj);
 			// const intervalId = setInterval(() => {
@@ -59,7 +82,7 @@ function ClientComponent() {
 		} else {
 			setClientStatus(CLIENT_NODE_STATE.ERROR);
 			setClientStatusTitle('Could not locate server alias...');
-			setConsoleStr('ERROR - bad alias = '+clientId);	
+			setConsoleStr('ERROR - bad alias = '+_firstClientId);	
 		}
 
 		window.addEventListener(CUSTOM_EVENTS.SOCKET_SERVER_OPEN, onServerOpen);
