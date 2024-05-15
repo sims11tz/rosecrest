@@ -46,7 +46,7 @@ export class SocketClient {
 			const target_ip = process.env[`${target}_ip`];
 			const target_port_external = process.env.socket_port;
 
-			const url = `ws://${target_ip}:${target_port_external}/ws`;
+			const url = `ws://${target_ip}:${target_port_external}/ws/`;
 			const wsc = new WebSocket(url);
 			let startTime: number=0;
 
