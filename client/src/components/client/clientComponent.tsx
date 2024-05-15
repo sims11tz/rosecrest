@@ -305,11 +305,12 @@ function ClientComponent() {
 			</div>
 			
 			<div className="clientStatus">
-				<div className={`clientStatusContainer ${clientStatus}`}>
+				<div className={`clientStatusContainer ${clientStatus} ${clientId}`}>
 					<div className="clientStatusTitle">{clientStatusTitle}</div>
-					<div className={`clientStatusContent ${clientActionState}`}>
+					<div className={`clientStatusContent  ${clientActionState}`}>
 						{clientStatusContent}
 					</div>
+					<div className="clientStatusContentBG server_bg_image"></div>
 				</div>
 			</div>
 			<div className="clientTools">

@@ -54,6 +54,8 @@
 
 .clientStatusContainer
 {
+	position: relative;
+
 	width: 100%;
 	height: 100%;
 
@@ -67,6 +69,47 @@
 	width: 100%;
 	height: 100%;
 	background-color: lightcyan;
+}
+
+.clientStatusContentBG.server_bg_image
+{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	opacity: 0.15;
+	background-size:100% 100%;
+}
+
+.server_aws_california .clientStatusContentBG
+{
+	background-image: url('/public/images/server_aws_california_bg.png');
+}
+
+.server_aws_ohio .clientStatusContentBG
+{
+	background-image: url('/public/images/server_aws_ohio_bg.png');
+}
+
+.server_aws_paris .clientStatusContentBG
+{
+	background-image: url('/public/images/server_aws_paris_bg.png');
+}
+
+.server_aws_dublin .clientStatusContentBG
+{
+	background-image: url('/public/images/server_aws_dublin_bg.png');
+}
+
+.server_aws_tokyo .clientStatusContentBG
+{
+	background-image: url('/public/images/server_aws_tokyo_bg.png');
+}
+
+.server_aws_brazil .clientStatusContentBG
+{
+	background-image: url('/public/images/server_aws_brazil_bg.png');
 }
 
 .clientStatusTitle
